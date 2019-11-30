@@ -1,10 +1,13 @@
 package br.unicamp.cotuca.trensibericos;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
 
-public class Caminho implements Keyable {
+public class Caminho implements Keyable, Serializable {
     private ListaSimples<Cidade> cidades;
     private int distancia, tempo;
     private boolean principal;
@@ -47,10 +50,34 @@ public class Caminho implements Keyable {
         setTempo(t);
     }
 
+    public Caminho(String linha, HashTable<Cidade> hashCidades)
+    {
+        cidades = new ListaSimples<Cidade>();
+        String[] blocos = new String[(int)Math.ceil((float)linha.length()/15)];
+        for (int i = 0; i < linha.length(); i += 15) {
+            String atual = linha.substring(i, Math.min(linha.length(), i + 15));
+            if (linha.length() - i > 15) {
+                cidades.add(hashCidades.get(atual.trim()));
+            } else {
+                distancia = Integer.parseInt(atual.substring(0, 5).trim());
+                tempo = Integer.parseInt(atual.substring(5).trim());
+            }
+        }
+    }
+
     public String toString()
     {
-        return String.format("%s --> %s [%d, %d]",
-                cidades.get(0).getNome(), cidades.get(1).getNome(), getDistancia(), getTempo());
+        String format = "";
+        Object[] args = new Object[2 + cidades.getSize()];
+        int i;
+        for (i = 0; i < cidades.getSize(); i++) {
+            format += "%-15s";
+            args[i] = cidades.get(i).getNome();
+        }
+        format += "%4s %4s";
+        args[i++] = distancia;
+        args[i] = tempo;
+        return String.format(Locale.FRANCE, format, args);
     }
 
     public boolean equals(Object o) {

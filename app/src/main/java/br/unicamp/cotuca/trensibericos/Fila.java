@@ -1,6 +1,8 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class Fila<Dado extends Keyable> {
+import java.io.Serializable;
+
+public class Fila<Dado extends Keyable & Serializable> {
     No<Dado> comeco, ultimo;
     int qtdDados;
 

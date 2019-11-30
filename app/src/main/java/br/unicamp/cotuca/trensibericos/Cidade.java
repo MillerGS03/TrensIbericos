@@ -1,9 +1,10 @@
 package br.unicamp.cotuca.trensibericos;
 
+import java.io.Serializable;
 import java.util.Locale;
 import java.util.Objects;
 
-public class Cidade implements Keyable {
+public class Cidade implements Keyable, Serializable {
     public final int comecoId = 0;
     public final int fimId = 2;
     public final int comecoNome = fimId;

@@ -54,6 +54,15 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         }, 300);
     }
 
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,43 +93,43 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
                 if (isOk())
                 {
                     Cidade cidade = new Cidade(-1, nome, x, y);
-                    BufferedReader leitor = null;
 
                     try {
-                        InputStream is = openFileInput("Cidades.txt");
+                        cidade.setId(getLastId() + 1);
 
-                        if (is != null) {
-                            leitor = new BufferedReader(new InputStreamReader(is));
-                            String ultimaLinha = null, linhaAtual = null;
+                        adicionarCidade(cidade);
 
-                            while ((linhaAtual = leitor.readLine()) != null)
-                                ultimaLinha = linhaAtual;
-
-                            is.close();
-
-                            Cidade ultima = new Cidade(ultimaLinha);
-                            cidade.setId(ultima.getId() + 1);
-
-                            adicionarCidade(cidade);
-
-                            Intent intent = new Intent(AdicionarCidadeActivity.this, MainActivity.class);
-                            startActivity(intent);
-                        }
+                        Intent intent = new Intent(AdicionarCidadeActivity.this, MainActivity.class);
+                        startActivity(intent);
                     } catch (IOException ex) {
                         Toast.makeText(AdicionarCidadeActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
                     }
+                } else {
+                    Toast.makeText(AdicionarCidadeActivity.this, "Preencha os campos corretamente!", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = activity.getCurrentFocus();
-        if (view == null) {
-            view = new View(activity);
+    private int getLastId() throws IOException
+    {
+        BufferedReader leitor = null;
+        InputStream is = openFileInput("Cidades.txt");
+
+        if (is != null) {
+            leitor = new BufferedReader(new InputStreamReader(is));
+            String ultimaLinha = null, linhaAtual = null;
+
+            while ((linhaAtual = leitor.readLine()) != null)
+                ultimaLinha = linhaAtual;
+
+            is.close();
+
+            Cidade ultima = new Cidade(ultimaLinha);
+
+            return ultima.getId();
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        return -2;
     }
 
     private boolean isOk()

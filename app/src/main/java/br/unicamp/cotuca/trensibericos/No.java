@@ -1,6 +1,8 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class No<T extends Keyable> implements Comparable<No<T>>
+import java.io.Serializable;
+
+public class No<T extends Keyable & Serializable> implements Comparable<No<T>>, Serializable
 {
     No prox;
     T info;

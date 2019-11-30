@@ -1,6 +1,8 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class ListaSimples<Dado extends Keyable> {
+import java.io.Serializable;
+
+public class ListaSimples<Dado extends Keyable & Serializable> implements Serializable {
     private No<Dado> comeco, fim;
     private int qtd;
 

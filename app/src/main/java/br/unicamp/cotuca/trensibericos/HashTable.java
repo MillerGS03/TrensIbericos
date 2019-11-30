@@ -1,6 +1,8 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class HashTable<Dado extends Keyable> {
+import java.io.Serializable;
+
+public class HashTable<Dado extends Keyable & Serializable> implements Serializable {
     protected final int TAMANHO_MAX = 10000;
     ListaSimples[] vet;
     int qtdDados;
