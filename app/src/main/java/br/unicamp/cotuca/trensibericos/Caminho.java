@@ -7,6 +7,7 @@ import java.util.Objects;
 public class Caminho {
     private ArrayList<Cidade> cidades;
     private int distancia, tempo;
+    private boolean principal;
 
     public int getDistancia()
     {
@@ -63,5 +64,12 @@ public class Caminho {
 
     public int hashCode() {
         return Objects.hash(getCidades(), getDistancia(), getTempo());
+    }
+
+    public boolean isPrincipal() {
+        return principal;
+    }
+    public void setPrincipal(boolean principal) {
+        this.principal = principal;
     }
 }

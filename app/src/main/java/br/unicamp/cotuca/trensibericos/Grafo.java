@@ -3,7 +3,7 @@ package br.unicamp.cotuca.trensibericos;
 public class Grafo {
     public static int qtdCidades = 54;
     Caminho[][] adj;
-    Fila prioridade;
+    Fila<Cidade> prioridade;
 
     public Grafo()
     {

@@ -1,6 +1,6 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class Fila<Dado extends Comparable<Dado>> {
+public class Fila<Dado extends Keyable> {
     No<Dado> comeco, ultimo;
     int qtdDados;
 

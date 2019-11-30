@@ -1,11 +1,21 @@
 package br.unicamp.cotuca.trensibericos;
 
+import java.util.Locale;
 import java.util.Objects;
 
-public class Cidade {
+public class Cidade implements Keyable {
+    public final int comecoId = 0;
+    public final int fimId = 2;
+    public final int comecoNome = fimId;
+    public final int fimNome = comecoNome + 16;
+    public final int comecoX = fimNome;
+    public final int fimX = comecoX + 6;
+    public final int comecoY = fimX + 1;
+
+
     private int id;
     private String nome;
-    private double x, y;
+    private float x, y;
 
     public int getId() {
         return id;
@@ -23,25 +33,26 @@ public class Cidade {
         this.nome = nome;
     }
 
-    public double getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(double x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public double getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(double y) {
+    public void setY(float y) {
         this.y = y;
     }
 
     public String toString()
     {
-        return String.format("%i - %s - (%f, %f)", getId(), getNome(), getX(), getY());
+        String s = String.format(Locale.FRANCE, "%2s%-16s%.3f %.3f", ""+getId(), getNome(), getX(), getY());
+        return s;
     }
 
     public Cidade()
@@ -52,7 +63,15 @@ public class Cidade {
         setY(0);
     }
 
-    public Cidade(int id, String nome, double x, double y)
+    public Cidade(String linha)
+    {
+        setId(Integer.parseInt(linha.substring(comecoId, fimId).trim()));
+        setNome(linha.substring(comecoNome, fimNome).trim());
+        setX(Float.parseFloat(linha.substring(comecoX, fimX).trim().replace(',', '.')));
+        setY(Float.parseFloat(linha.substring(comecoY).trim().replace(',', '.')));
+    }
+
+    public Cidade(int id, String nome, float x, float y)
     {
         setId(id);
         setNome(nome);
@@ -70,7 +89,8 @@ public class Cidade {
                 getNome().equals(cidade.getNome());
     }
 
-    public int hashCode() {
-        return Objects.hash(getId(), getNome(), getX(), getY());
+    public String getKey()
+    {
+        return getNome();
     }
 }

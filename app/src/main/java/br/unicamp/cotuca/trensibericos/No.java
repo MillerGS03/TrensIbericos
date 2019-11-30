@@ -1,6 +1,6 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class No<T extends Comparable<T>> implements Comparable<No<T>>
+public class No<T extends Keyable> implements Comparable<No<T>>
 {
     No prox;
     T info;
@@ -30,7 +30,7 @@ public class No<T extends Comparable<T>> implements Comparable<No<T>>
         this.info = info;
     }
 
-    public No getProx() {
+    public No<T> getProx() {
         return prox;
     }
     public void setProx(No prox) {
@@ -63,6 +63,6 @@ public class No<T extends Comparable<T>> implements Comparable<No<T>>
 
     public int compareTo(No<T> outro)
     {
-        return info.compareTo(outro.getInfo());
+        return info.getKey().compareTo(outro.getInfo().getKey());
     }
 }
