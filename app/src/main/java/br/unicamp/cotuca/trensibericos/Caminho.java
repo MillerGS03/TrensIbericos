@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Caminho {
-    private ArrayList<Cidade> cidades;
+public class Caminho implements Keyable {
+    private ListaSimples<Cidade> cidades;
     private int distancia, tempo;
     private boolean principal;
 
@@ -27,20 +27,20 @@ public class Caminho {
         tempo = t;
     }
 
-    public ArrayList<Cidade> getCidades()
+    public ListaSimples<Cidade> getCidades()
     {
         return cidades;
     }
 
     public Caminho()
     {
-        cidades = new ArrayList<Cidade>();
+        cidades = new ListaSimples<Cidade>();
         tempo = distancia = -1;
     }
 
     public Caminho(Cidade c1, Cidade c2, int d, int t)
     {
-        cidades = new ArrayList<Cidade>();
+        cidades = new ListaSimples<Cidade>();
         cidades.add(c1);
         cidades.add(c2);
         setDistancia(d);
@@ -71,5 +71,10 @@ public class Caminho {
     }
     public void setPrincipal(boolean principal) {
         this.principal = principal;
+    }
+
+    public String getKey()
+    {
+        return toString();
     }
 }

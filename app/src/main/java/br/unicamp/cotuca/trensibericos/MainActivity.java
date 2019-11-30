@@ -52,5 +52,6 @@ public class MainActivity extends AppCompatActivity {
         llMapa.addView(mapa);
 
         HashTable<Cidade> cidadesLidas = getCidades();
+        mapa.setCidades(cidadesLidas);
     }
 }

@@ -11,16 +11,15 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 
 public class CanvasMapa extends View {
     private Context contexto;
-    private ArrayList<Cidade> cidades;
+    private HashTable<Cidade> cidades;
     private Bitmap background;
     private View parent;
+    private ListaSimples<Caminho> caminhos;
+    private int corPadrao = Color.BLUE;
 
     public CanvasMapa(Context context) {
         super(context);
@@ -28,9 +27,14 @@ public class CanvasMapa extends View {
         background = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier("mapa", "drawable", context.getPackageName()));
     }
 
-    public void setCidades(ArrayList<Cidade> cidades)
+    public void setCidades(HashTable<Cidade> cidades)
     {
         this.cidades = cidades;
+        invalidate();
+    }
+    public void setCaminhos(ListaSimples<Caminho> caminhos)
+    {
+        this.caminhos = caminhos;
         invalidate();
     }
 
@@ -50,19 +54,59 @@ public class CanvasMapa extends View {
         canvas.save();
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.BLACK);
+        paint.setColor(corPadrao);
 
         if (cidades == null)
             return;
 
-        for(Cidade cidade : cidades)
-            canvas.drawCircle(cidade.getX(), cidade.getY(), 2, paint);
+        ListaSimples[] listas = cidades.getVetor();
+
+        for(ListaSimples lista : listas) {
+            for(int i = 0; i < lista.getSize(); i++)
+            {
+                Cidade cidade = (Cidade)lista.get(i);
+                canvas.drawCircle(getWidth() * cidade.getX(), getHeight() * cidade.getY(), 5, paint);
+            }
+        }
 
         canvas.restore();
     }
     public void desenharCaminhos(Canvas canvas)
     {
-        //
+        if (caminhos == null)
+            return;
+
+        Paint paint = new Paint();
+        float x1 = -1, x2 = -1, y1 = -1, y2 = -1;
+
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5f);
+
+        for(int i = 0; i < caminhos.getSize(); i++)
+        {
+            Caminho caminho = caminhos.get(i);
+
+            if (caminho.isPrincipal())
+                paint.setColor(corPadrao);
+            else
+                paint.setColor(Color.rgb(161, 161, 161));
+
+            ListaSimples<Cidade> cidades = caminho.getCidades();
+
+            for(int j = 0; j < cidades.getSize(); j++)
+            {
+                Cidade cidade = cidades.get(j);
+
+                x2 = cidade.getX() * getWidth();
+                y2 = cidade.getY() * getHeight();
+
+                if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1)
+                    canvas.drawLine(x1, y1, x2, y2, paint);
+
+                x1 = cidade.getX() * getWidth();
+                y1 = cidade.getY() * getHeight();
+            }
+        }
     }
 
     @Override

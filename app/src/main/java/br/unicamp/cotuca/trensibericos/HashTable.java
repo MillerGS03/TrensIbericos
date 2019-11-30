@@ -53,4 +53,18 @@ public class HashTable<Dado extends Keyable> {
 
         return (Dado)lista.find(key);
     }
+
+    public ListaSimples[] getVetor()
+    {
+        ListaSimples[] ret = new ListaSimples[qtdDados];
+        int ind = 0;
+
+        for (int i = 0; i < vet.length; i++)
+        {
+            if (vet[i] != null)
+                ret[ind++] = vet[i];
+        }
+
+        return ret;
+    }
 }

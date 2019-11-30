@@ -64,4 +64,9 @@ public class ListaSimples<Dado extends Keyable> {
             return null;
         return no.getInfo();
     }
+
+    public int getSize()
+    {
+        return qtd;
+    }
 }
