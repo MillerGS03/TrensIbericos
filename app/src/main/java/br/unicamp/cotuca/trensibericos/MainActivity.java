@@ -9,9 +9,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -23,14 +26,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     LinearLayout llMapa;
     FrameLayout conteudo;
-    Button btnAddCidade, btnAddCaminho;
+    Button btnAddCidade, btnAddCaminho, btnBuscar;
+    Spinner sDe, sPara;
 
     CanvasMapa mapa;
-    HashTable<Cidade> cidades;
+    Grafo grafo;
 
     //region operacoes IO
 
@@ -68,9 +73,9 @@ public class MainActivity extends AppCompatActivity {
         escrevedor.close();
     }
 
-    public HashTable<Cidade> getCidades()
+    public HashTable<Cidade, String> getCidades()
     {
-        HashTable<Cidade> ret = new HashTable<Cidade>();
+        HashTable<Cidade, String> ret = new HashTable<>();
         BufferedReader leitor = null;
 
         try {
@@ -101,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         return ret;
     }
 
-    public ListaSimples<Caminho> getCaminhos(HashTable<Cidade> hash) {
-        ListaSimples<Caminho> caminhos = new ListaSimples<Caminho>();
+    public ListaSimples<Caminho> getCaminhos(HashTable<Cidade, String> hash) {
+        ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
         BufferedReader leitor = null;
 
@@ -148,6 +153,18 @@ public class MainActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
             }
         }, 300);
+
+        conteudo.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int i) {
+                conteudo.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+            }
+        });
     }
 
     @Override
@@ -160,19 +177,35 @@ public class MainActivity extends AppCompatActivity {
         llMapa = (LinearLayout)findViewById(R.id.llMapa);
         btnAddCidade = (Button)findViewById(R.id.btnAddCidade);
         btnAddCaminho = (Button)findViewById(R.id.btnAddCaminho);
+        sDe = (Spinner)findViewById(R.id.spinnerDe);
+        sPara = (Spinner)findViewById(R.id.spinnerPara);
+        btnBuscar = (Button)findViewById(R.id.btnBuscar);
 
         iniciarFullscreen();
 
         llMapa.removeAllViews();
         llMapa.addView(mapa);
 
+        grafo = new Grafo();
+
         try {
             resetarArquivos();
 
-            cidades = getCidades();
+            HashTable<Cidade, String> cidades = getCidades();
+            grafo.setCidades(cidades);
+
             ListaSimples<Caminho> caminhos = getCaminhos(cidades);
-            mapa.setCidades(cidades);
-        } catch (IOException ex) {}
+            grafo.setLigacoes(caminhos);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        mapa.setCidades(grafo.getCidades());
+
+        ListaSimples<String> nomes = grafo.getCidades().getKeys();
+
+        sDe.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
+        sPara.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
 
         btnAddCidade.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,10 +220,22 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AdicionarCaminhoActivity.class);
                 Bundle params = new Bundle();
-                params.putSerializable("cidades", cidades);
+                params.putSerializable("cidades", grafo.getCidades());
                 intent.putExtras(params);
 
                 startActivity(intent);
+            }
+        });
+
+        btnBuscar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String c1 = sDe.getSelectedItem().toString();
+                String c2 = sPara.getSelectedItem().toString();
+
+                ListaSimples<Caminho> res = grafo.getPaths(c1, c2);
+
+                mapa.setCaminhos(res);
             }
         });
     }

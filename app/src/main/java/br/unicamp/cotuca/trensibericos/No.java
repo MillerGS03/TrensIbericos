@@ -2,7 +2,7 @@ package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
 
-public class No<T extends Keyable & Serializable> implements Comparable<No<T>>, Serializable
+public class No<T extends Comparable<T>> implements Comparable<No<T>>, Serializable
 {
     No prox;
     T info;
@@ -63,8 +63,7 @@ public class No<T extends Keyable & Serializable> implements Comparable<No<T>>, 
         return true;
     }
 
-    public int compareTo(No<T> outro)
-    {
-        return info.getKey().compareTo(outro.getInfo().getKey());
+    public int compareTo(No<T> no) {
+        return no.getInfo().compareTo(info);
     }
 }

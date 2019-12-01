@@ -22,7 +22,7 @@ public class AdicionarCaminhoActivity extends AppCompatActivity {
     EditText edtCidade1, edtCidade2, edtDistancia, edtTempo;
     Button btnAdd;
 
-    HashTable<Cidade> cidades;
+    HashTable<Cidade, String> cidades;
 
     String cidade1, cidade2;
     int dist, tempo;
@@ -67,7 +67,7 @@ public class AdicionarCaminhoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle params = intent.getExtras();
-        cidades = (HashTable<Cidade>) params.getSerializable("cidades");
+        cidades = (HashTable<Cidade, String>) params.getSerializable("cidades");
 
         llConteudo.setOnClickListener(new View.OnClickListener() {
             @Override

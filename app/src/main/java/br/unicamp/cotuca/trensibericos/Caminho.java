@@ -1,13 +1,9 @@
 package br.unicamp.cotuca.trensibericos;
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
-public class Caminho implements Keyable, Serializable {
+public class Caminho extends Hashable<Caminho, String> {
     private ListaSimples<Cidade> cidades;
     private int distancia, tempo;
     private boolean principal;
@@ -50,7 +46,7 @@ public class Caminho implements Keyable, Serializable {
         setTempo(t);
     }
 
-    public Caminho(String linha, HashTable<Cidade> hashCidades)
+    public Caminho(String linha, HashTable<Cidade, String> hashCidades)
     {
         cidades = new ListaSimples<Cidade>();
         String[] blocos = new String[(int)Math.ceil((float)linha.length()/15)];

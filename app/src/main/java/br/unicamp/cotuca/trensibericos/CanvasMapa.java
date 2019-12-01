@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 
 public class CanvasMapa extends View {
     private Context contexto;
-    private HashTable<Cidade> cidades;
+    private HashTable<Cidade, String> cidades;
     private Bitmap background;
     private View parent;
     private ListaSimples<Caminho> caminhos;
@@ -26,7 +26,7 @@ public class CanvasMapa extends View {
         background = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier("mapa", "drawable", context.getPackageName()));
     }
 
-    public void setCidades(HashTable<Cidade> cidades)
+    public void setCidades(HashTable<Cidade, String> cidades)
     {
         this.cidades = cidades;
         invalidate();
@@ -60,12 +60,9 @@ public class CanvasMapa extends View {
 
         ListaSimples[] listas = cidades.getVetor();
 
-        for(ListaSimples lista : listas) {
-            for(int i = 0; i < lista.getSize(); i++)
-            {
-                Cidade cidade = (Cidade)lista.get(i);
+        for(ListaSimples<Cidade> lista : listas) {
+            for (Cidade cidade : lista)
                 canvas.drawCircle(getWidth() * cidade.getX(), getHeight() * cidade.getY(), 5, paint);
-            }
         }
 
         canvas.restore();
@@ -81,10 +78,7 @@ public class CanvasMapa extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5f);
 
-        for(int i = 0; i < caminhos.getSize(); i++)
-        {
-            Caminho caminho = caminhos.get(i);
-
+        for (Caminho caminho : caminhos) {
             if (caminho.isPrincipal())
                 paint.setColor(corPadrao);
             else
@@ -92,10 +86,7 @@ public class CanvasMapa extends View {
 
             ListaSimples<Cidade> cidades = caminho.getCidades();
 
-            for(int j = 0; j < cidades.getSize(); j++)
-            {
-                Cidade cidade = cidades.get(j);
-
+            for (Cidade cidade : cidades) {
                 x2 = cidade.getX() * getWidth();
                 y2 = cidade.getY() * getHeight();
 

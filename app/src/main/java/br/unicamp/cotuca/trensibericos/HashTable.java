@@ -1,29 +1,27 @@
 package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
+import java.util.function.Predicate;
 
-public class HashTable<Dado extends Keyable & Serializable> implements Serializable {
+public class HashTable<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
     protected final int TAMANHO_MAX = 10000;
-    ListaSimples[] vet;
-    int qtdDados;
+    protected ListaHash[] vet;
+    protected int qtdDados;
 
     public HashTable(int tamanho)
     {
-        vet = new ListaSimples[tamanho];
+        vet = new ListaHash[tamanho];
         qtdDados = 0;
     }
     public HashTable()
     {
-        vet = new ListaSimples[TAMANHO_MAX];
+        vet = new ListaHash[TAMANHO_MAX];
         qtdDados = 0;
     }
 
-    protected int hash(String key)
+    protected int hash(Key key)
     {
-        long ret = 37;
-
-        for (byte b : key.getBytes())
-            ret += 2003 * ret + b; //2003 é primo!
+        long ret = key.hashCode();
 
         ret %= vet.length - 1;
 
@@ -33,10 +31,10 @@ public class HashTable<Dado extends Keyable & Serializable> implements Serializa
     public void add(Dado dado)
     {
         int index = hash(dado.getKey());
-        ListaSimples lista = vet[index];
+        ListaHash lista = vet[index];
 
         if (lista == null)
-            lista = new ListaSimples();
+            lista = new ListaHash();
 
         lista.add(dado);
 
@@ -45,10 +43,10 @@ public class HashTable<Dado extends Keyable & Serializable> implements Serializa
         qtdDados++;
     }
 
-    public Dado get(String key)
+    public Dado get(Key key)
     {
         int index = hash(key);
-        ListaSimples lista = vet[index];
+        ListaHash lista = vet[index];
 
         if (lista == null)
             return null;
@@ -56,17 +54,52 @@ public class HashTable<Dado extends Keyable & Serializable> implements Serializa
         return (Dado)lista.find(key);
     }
 
-    public ListaSimples[] getVetor()
+    public ListaHash[] getVetor()
     {
-        ListaSimples[] ret = new ListaSimples[qtdDados];
+        ListaHash[] arr = new ListaHash[qtdDados];
         int ind = 0;
 
         for (int i = 0; i < vet.length; i++)
         {
             if (vet[i] != null)
-                ret[ind++] = vet[i];
+                arr[ind++] = vet[i];
         }
 
+        ListaHash[] ret = new ListaHash[ind];
+
+        for(int i = 0; i < ind; i++)
+            ret[i] = arr[i];
+
         return ret;
+    }
+
+    public ListaSimples<Key> getKeys() {
+        ListaSimples<Key> keys = new ListaSimples<>();
+        ListaHash[] arr = getVetor();
+        for(ListaHash<Dado, Key> lista : arr) {
+            for (Dado dado : lista)
+                keys.add(dado.getKey());
+        }
+
+        return keys;
+    }
+
+    public ListaSimples<Key> getKeys(Predicate<Dado> predicate)
+    {
+        ListaSimples<Key> keys = new ListaSimples<>();
+        ListaHash[] arr = getVetor();
+        for(ListaHash<Dado, Key> lista : arr) {
+            for (Dado dado : lista) {
+                if (predicate.test(dado))
+                    keys.add(dado.getKey());
+            }
+        }
+
+        return keys;
+    }
+
+    public int getSize()
+    {
+        return qtdDados;
     }
 }
