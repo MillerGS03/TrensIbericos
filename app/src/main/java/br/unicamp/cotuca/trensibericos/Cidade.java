@@ -92,4 +92,12 @@ public class Cidade extends Hashable<Cidade, String> {
     {
         return getNome();
     }
+
+    public long getKeyHashcode(String hash) {
+        long ret = 88;
+        for(byte b : hash.getBytes()) {
+            ret = 7 * ret + b;
+        }
+        return ret;
+    }
 }

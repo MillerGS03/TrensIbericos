@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -75,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
     public HashTable<Cidade, String> getCidades()
     {
-        HashTable<Cidade, String> ret = new HashTable<>();
+        HashTable<Cidade, String> ret = new HashTable<>(Cidade.class);
         BufferedReader leitor = null;
 
         try {
             InputStream is = openFileInput("Cidades.txt");
 
             if (is != null) {
-                leitor = new BufferedReader(new InputStreamReader(is));
+                leitor = new BufferedReader(new InputStreamReader(is, "UTF8"));
                 String linha = "";
 
                 while ((linha = leitor.readLine()) != null)

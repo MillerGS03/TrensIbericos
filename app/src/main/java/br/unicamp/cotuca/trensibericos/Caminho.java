@@ -100,4 +100,11 @@ public class Caminho extends Hashable<Caminho, String> {
     {
         return toString();
     }
+    public long getKeyHashcode(String hash) {
+        long ret = 88;
+        for(byte b : hash.getBytes()) {
+            ret = 7 * ret + b;
+        }
+        return ret;
+    }
 }

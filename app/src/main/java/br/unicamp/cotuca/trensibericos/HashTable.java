@@ -1,31 +1,40 @@
 package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
 public class HashTable<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
     protected final int TAMANHO_MAX = 10000;
     protected ListaHash[] vet;
     protected int qtdDados;
+    protected Class<? extends Dado> classe;
 
-    public HashTable(int tamanho)
+    public HashTable(int tamanho, Class<? extends Dado> c)
     {
         vet = new ListaHash[tamanho];
         qtdDados = 0;
+        classe = c;
     }
-    public HashTable()
+    public HashTable(Class<? extends Dado> c)
     {
+        classe = c;
         vet = new ListaHash[TAMANHO_MAX];
         qtdDados = 0;
     }
 
     protected int hash(Key key)
     {
-        long ret = key.hashCode();
+        try {
+            Dado dado = classe.newInstance();
+            long ret = dado.getKeyHashcode(key);
 
-        ret %= vet.length - 1;
+            ret %= vet.length - 1;
 
-        return (int)Math.abs(ret);
+            return (int) Math.abs(ret);
+        } catch (Exception ex) {
+            return -1;
+        }
     }
 
     public void add(Dado dado)

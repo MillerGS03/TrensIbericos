@@ -6,6 +6,8 @@ public abstract class Hashable<Dado extends Hashable<Dado, Key>, Key extends Com
 
     public abstract Key getKey();
 
+    public abstract long getKeyHashcode(Key key);
+
     public int compareTo(Dado dado)
     {
         return getKey().compareTo(dado.getKey());
