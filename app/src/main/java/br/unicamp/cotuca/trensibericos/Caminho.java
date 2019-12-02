@@ -50,6 +50,12 @@ public class Caminho extends Hashable<Caminho, String> {
         setTempo(t);
     }
 
+    public Caminho(ListaSimples<Cidade> cidades, int d, int t) {
+        this.cidades = cidades;
+        setDistancia(d);
+        setTempo(t);
+    }
+
     public Caminho(String linha, HashTable<Cidade, String> hashCidades)
     {
         cidades = new ListaSimples<Cidade>();

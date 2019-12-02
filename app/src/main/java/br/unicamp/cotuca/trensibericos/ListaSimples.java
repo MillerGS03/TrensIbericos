@@ -14,7 +14,7 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
     {
         comeco = null;
     }
-    public ListaSimples(Dado[] vet) {
+    public ListaSimples(Dado... vet) {
         for (Dado dado : vet)
             add(dado);
     }
@@ -59,6 +59,30 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
     }
     public void set(Dado data, int index) {
         getNode(index).setInfo(data);
+    }
+
+    public void addValues(ListaSimples<Dado> l) {
+        No<Dado> no1 = comeco;
+        No<Dado> no2 = l.comeco;
+
+        while (no1 != null && no2 != null) {
+            Dado info1 = no1.getInfo();
+            Dado info2 = no2.getInfo();
+            Object set = info1;
+
+            if (info1 instanceof Character && info2 instanceof Character) {
+                set = ((Character)info1) + ((Character)info2);
+            } else if (info1 instanceof Number && info2 instanceof Number) {
+                set = ((Number)info1).doubleValue() + ((Number)info2).doubleValue();
+            } else {
+                set = info1.toString() + info2.toString();
+            }
+
+            no1.setInfo((Dado)set);
+
+            no1 = no1.getProx();
+            no2 = no2.getProx();
+        }
     }
 
     public int getSize()

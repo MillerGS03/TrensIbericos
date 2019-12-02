@@ -201,7 +201,10 @@ public class MainActivity extends AppCompatActivity {
             grafo.setDados(listaCidades);
 
             ListaSimples<Caminho> caminhos = getCaminhos(cidades);
-            //
+            for (Caminho caminho : caminhos) {
+                grafo.setLigacao(caminho.getCidades().get(0).getId(), caminho.getCidades().get(1).getId(),
+                        caminho.getDistancia(), caminho.getTempo());
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -241,11 +244,14 @@ public class MainActivity extends AppCompatActivity {
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
-                Cidade cidade = hashCidades.get(c1);
+                Path<Cidade>[] res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
+                ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
-                Path<Cidade> res = grafo.getPath(hashCidades.get(c1).getId(), hashCidades.get(c2).getId(), 0);
+                for (Path<Cidade> path : res) {
+                    caminhos.add(new Caminho(path.getPath(), (int)path.getParams().get(0), (int)path.getParams().get(1)));
+                }
 
-                //mapa.setCaminhos(res);
+                mapa.setCaminhos(caminhos);
             }
         });
     }

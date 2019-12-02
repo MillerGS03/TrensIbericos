@@ -22,15 +22,12 @@ public class Path<Dado extends Serializable & Comparable<Dado>> {
     public void addToParams(Object data, int index) {
         Object add = params.get(index);
         if (data instanceof Character) {
-            add = ((Character)data) + ((Character)params.get(index));
-        } else if (data instanceof String) {
-            add = ((String)data) + ((String)params.get(index));
+            add = ((Character)data) + ((Character)add);
         } else if (data instanceof Number) {
-            add = ((Double)data) + ((Double)params.get(index));
+            add = ((Number)data).doubleValue() + ((Number)add).doubleValue();
+        } else {
+            add = data.toString() + add.toString();
         }
         params.set(add, index);
-    }
-    public void addToPath(Dado dado) {
-        path.add(dado);
     }
 }
