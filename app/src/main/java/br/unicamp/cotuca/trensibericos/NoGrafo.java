@@ -4,17 +4,16 @@ import java.io.Serializable;
 
 public class NoGrafo<Dado extends Serializable & Comparable<Dado>> implements Serializable, Comparable<NoGrafo<Dado>> {
     protected Dado dado;
-    protected Dado anterior;
+    protected NoGrafo<Dado> anterior;
     protected double distancia;
     protected boolean foiVisitado;
-    protected boolean estaAtivo;
+    protected int indice;
 
-    public boolean estaAtivo() {
-        return estaAtivo;
+    public int getIndice() {
+        return indice;
     }
-
-    public void setEstaAtivo(boolean estaAtivo) {
-        this.estaAtivo = estaAtivo;
+    public void setIndice(int indice) {
+        this.indice = indice;
     }
 
     public boolean foiVisitado() {
@@ -32,10 +31,10 @@ public class NoGrafo<Dado extends Serializable & Comparable<Dado>> implements Se
         this.dado = dado;
     }
 
-    public Dado getAnterior() {
+    public NoGrafo<Dado> getAnterior() {
         return anterior;
     }
-    public void setAnterior(Dado ant) {
+    public void setAnterior(NoGrafo<Dado> ant) {
         this.anterior = ant;
     }
 
@@ -50,12 +49,14 @@ public class NoGrafo<Dado extends Serializable & Comparable<Dado>> implements Se
         dado = null;
         anterior = null;
         distancia = -1;
+        indice = -1;
     }
 
-    public NoGrafo(Dado d, Dado ant, double dist) {
+    public NoGrafo(Dado d, NoGrafo<Dado> ant, double dist, int ind) {
         dado = d;
         anterior = ant;
         distancia = dist;
+        indice = ind;
     }
 
     public int compareTo(NoGrafo<Dado> dadoNoGrafo) {

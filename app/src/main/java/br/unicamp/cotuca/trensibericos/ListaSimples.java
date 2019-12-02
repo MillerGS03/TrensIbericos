@@ -30,6 +30,15 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
         qtd++;
     }
 
+    public void addToBeginning(Dado dado)
+    {
+        No<Dado> no = new No<>(dado, comeco);
+        comeco = no;
+        if (fim == null)
+            fim = no;
+        qtd++;
+    }
+
     public void remove(int index) {
         if (comeco == null) return;
         if (index == 0)
@@ -48,14 +57,15 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
         int i = 0;
         No<Dado> no;
         for(no = comeco; no != null && i != index; no = no.getProx(), i++) {}
-        if (no == null)
-            return null;
         return no;
     }
 
     public Dado get(int index)
     {
-        return getNode(index).getInfo();
+        No<Dado> no = getNode(index);
+        if (no != null)
+            return no.getInfo();
+        return null;
     }
     public void set(Dado data, int index) {
         getNode(index).setInfo(data);

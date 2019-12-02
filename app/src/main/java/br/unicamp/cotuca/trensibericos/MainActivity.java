@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         escrevedor.close();
     }
 
-    public HashTable<Cidade, String> getCidades()
+    public HashTable<Cidade, String> getCidades(ListaSimples<Cidade> listaCidades)
     {
         HashTable<Cidade, String> ret = new HashTable<>(Cidade.class);
         BufferedReader leitor = null;
@@ -88,8 +88,11 @@ public class MainActivity extends AppCompatActivity {
                 leitor = new BufferedReader(new InputStreamReader(is, "UTF8"));
                 String linha = "";
 
-                while ((linha = leitor.readLine()) != null)
-                    ret.add(new Cidade(linha));
+                while ((linha = leitor.readLine()) != null) {
+                    Cidade c = new Cidade(linha);
+                    ret.add(c);
+                    listaCidades.add(c);
+                }
 
                 is.close();
             }
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 resetarArquivos();
 
-                return getCidades();
+                return getCidades(listaCidades);
             } catch (IOException ioEx) {
                 Toast.makeText(this, ioEx.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -196,8 +199,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             resetarArquivos();
 
-            cidades = getCidades();
-            ListaSimples<Cidade> listaCidades = new ListaSimples<>();
+            ListaSimples<Cidade> listaCidades = new ListaSimples<Cidade>();
+            cidades = getCidades(listaCidades);
             grafo.setDados(listaCidades);
 
             ListaSimples<Caminho> caminhos = getCaminhos(cidades);
@@ -244,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
-                Path<Cidade>[] res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
+                ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
                 ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
                 for (Path<Cidade> path : res) {
