@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import java.beans.*;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     LinearLayout llMapa;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     Spinner sDe, sPara;
 
     CanvasMapa mapa;
-    Grafo grafo;
+    Grafo<Cidade> grafo;
 
     //region operacoes IO
 
@@ -187,23 +189,28 @@ public class MainActivity extends AppCompatActivity {
         llMapa.removeAllViews();
         llMapa.addView(mapa);
 
-        grafo = new Grafo();
+        grafo = new Grafo<>();
+
+        HashTable<Cidade, String> cidades = new HashTable<>(Cidade.class);
 
         try {
             resetarArquivos();
 
-            HashTable<Cidade, String> cidades = getCidades();
-            grafo.setCidades(cidades);
+            cidades = getCidades();
+            ListaSimples<Cidade> listaCidades = new ListaSimples<>();
+            grafo.setDados(listaCidades);
 
             ListaSimples<Caminho> caminhos = getCaminhos(cidades);
-            grafo.setLigacoes(caminhos);
+            //
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        mapa.setCidades(grafo.getCidades());
+        final HashTable<Cidade, String> hashCidades = cidades;
 
-        ListaSimples<String> nomes = grafo.getCidades().getKeys();
+        mapa.setCidades(cidades);
+
+        ListaSimples<String> nomes = cidades.getKeys();
 
         sDe.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
         sPara.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
@@ -221,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AdicionarCaminhoActivity.class);
                 Bundle params = new Bundle();
-                params.putSerializable("cidades", grafo.getCidades());
+                params.putSerializable("cidades", hashCidades);
                 intent.putExtras(params);
 
                 startActivity(intent);
@@ -234,9 +241,11 @@ public class MainActivity extends AppCompatActivity {
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
-                ListaSimples<Caminho> res = grafo.getPaths(c1, c2);
+                Cidade cidade = hashCidades.get(c1);
 
-                mapa.setCaminhos(res);
+                Path<Cidade> res = grafo.getPath(hashCidades.get(c1).getId(), hashCidades.get(c2).getId(), 0);
+
+                //mapa.setCaminhos(res);
             }
         });
     }

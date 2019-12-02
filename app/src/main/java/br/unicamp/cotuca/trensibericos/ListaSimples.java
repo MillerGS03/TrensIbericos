@@ -6,13 +6,17 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class ListaSimples<Dado extends Comparable<Dado>> implements Serializable, Iterable<Dado> {
+public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
     protected No<Dado> comeco, fim;
     private int qtd;
 
     public ListaSimples()
     {
         comeco = null;
+    }
+    public ListaSimples(Dado[] vet) {
+        for (Dado dado : vet)
+            add(dado);
     }
 
     public void add(Dado dado)
@@ -40,15 +44,21 @@ public class ListaSimples<Dado extends Comparable<Dado>> implements Serializable
         ant.setProx(no.getProx());
     }
 
-
-    public Dado get(int index)
-    {
+    protected No<Dado> getNode(int index) {
         int i = 0;
         No<Dado> no;
         for(no = comeco; no != null && i != index; no = no.getProx(), i++) {}
         if (no == null)
             return null;
-        return no.getInfo();
+        return no;
+    }
+
+    public Dado get(int index)
+    {
+        return getNode(index).getInfo();
+    }
+    public void set(Dado data, int index) {
+        getNode(index).setInfo(data);
     }
 
     public int getSize()
@@ -58,7 +68,7 @@ public class ListaSimples<Dado extends Comparable<Dado>> implements Serializable
 
     public Dado[] toArray(Class<? extends Dado[]> classe)
     {
-        ArrayList<Dado> ret = new ArrayList<Dado>();
+        ArrayList<Dado> ret = new ArrayList<>();
         No<Dado> no = comeco;
 
         while(no != null) {

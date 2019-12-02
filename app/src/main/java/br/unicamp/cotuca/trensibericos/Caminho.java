@@ -30,6 +30,10 @@ public class Caminho extends Hashable<Caminho, String> {
     {
         return cidades;
     }
+    public void setCidades(ListaSimples<Cidade> cidades) {
+        this.cidades = cidades;
+
+    }
 
     public Caminho()
     {

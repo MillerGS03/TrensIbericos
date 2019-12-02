@@ -1,33 +1,53 @@
 package br.unicamp.cotuca.trensibericos;
 
-public class Grafo {
-    public static int qtdCidades = 54;
-    protected HashTable<Cidade, String> cidades;
-    protected ListaSimples<Caminho> ligacoes;
-    protected Caminho[][] adj;
-    protected Fila<Cidade> prioridade;
+import java.io.Serializable;
 
-    public void setCidades(HashTable<Cidade, String> cidades) {
-        this.cidades = cidades;
-    }
-    public void setLigacoes(ListaSimples<Caminho> caminhos) {
-        this.ligacoes = caminhos;
+public class Grafo<Dado extends Serializable & Comparable<Dado>> {
+    protected int qtdDados = 54;
+
+    protected ListaSimples<NoGrafo<Dado>> nos;
+    protected ListaSimples<Double>[][] adj;
+
+    public void setDados(ListaSimples<Dado> dados) {
+        qtdDados = dados.getSize();
+        nos = new ListaSimples<>();
     }
 
-    public HashTable<Cidade, String> getCidades() {
-        return cidades;
+    public void setLigacao(int d1, int d2, Double... vals) {
+        adj[d1][d2] = new ListaSimples<>(vals);
     }
-    public ListaSimples<Caminho> getLigacoes() {
-        return ligacoes;
+    public void setLigacao(int d1, int d2, ListaSimples<Double> lista) {
+        adj[d1][d2] = lista;
+    }
+
+    protected void adicinarLista(ListaSimples<Double> l1, ListaSimples<Double> l2) {
+        //
     }
 
     public Grafo()
     {
-        adj = new Caminho[qtdCidades][qtdCidades];
+        adj = new ListaSimples[qtdDados][qtdDados];
+        nos = new ListaSimples<>();
     }
-    public ListaSimples<Caminho> getPaths(String c1, String c2) {
-        Cidade cidade1 = cidades.get(c1);
-        Cidade cidade2 = cidades.get(c2);
-        return null;
+    protected void resetarNos() {
+        for(NoGrafo<Dado> no : nos) {
+            no.setAnterior(null);
+            no.setDistancia(Double.POSITIVE_INFINITY);
+            no.setEstaAtivo(true);
+            no.setFoiVisitado(false);
+        }
+    }
+
+    public Path<Dado> getPath(int c1, int c2, int ordenacao) {
+        resetarNos();
+
+        nos.get(c1).setFoiVisitado(true);
+        nos.get(c1).setDistancia(0);
+
+        Path<Dado> path = new Path<>();
+
+        int noAtual = c1;
+
+        return path;
     }
 }

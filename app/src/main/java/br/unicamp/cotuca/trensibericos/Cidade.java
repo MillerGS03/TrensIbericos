@@ -11,10 +11,9 @@ public class Cidade extends Hashable<Cidade, String> {
     public final int fimX = comecoX + 6;
     public final int comecoY = fimX + 1;
 
-
-    private int id;
-    private String nome;
-    private float x, y;
+    protected int id;
+    protected String nome;
+    protected float x, y;
 
     public int getId() {
         return id;
