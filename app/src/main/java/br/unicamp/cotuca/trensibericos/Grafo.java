@@ -1,5 +1,8 @@
 package br.unicamp.cotuca.trensibericos;
 
+import android.content.Intent;
+import android.util.Log;
+
 import java.io.Serializable;
 
 public class Grafo<Dado extends Serializable & Comparable<Dado>> {
@@ -34,25 +37,35 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
     {
         nos = new ListaSimples<>();
     }
-    protected void resetarNos() {
+    protected void resetarNos(int inicio, int ordenacao) {
+        int ind = 0;
+
         for(NoGrafo<Dado> no : nos) {
             no.setAnterior(null);
-            no.setDistancia(Double.POSITIVE_INFINITY);
+            ListaSimples lista = adj[inicio][ind];
+            if (lista != null)
+                no.setDistancia(((Number)lista.get(ordenacao)).doubleValue());
+            else
+                no.setDistancia(Double.POSITIVE_INFINITY);
             no.setFoiVisitado(false);
+
+            ind++;
         }
+
     }
 
     protected Path<Dado> getPath(int c1, int c2, int ordenacao) {
-        resetarNos();
+        resetarNos(c1, ordenacao);
 
         nos.get(c1).setFoiVisitado(true);
         nos.get(c1).setDistancia(0);
 
         Path<Dado> path = new Path<>();
 
-        for (NoGrafo<Dado> no : nos)
+        for (int i = 0; i < nos.getSize(); i++)
         {
             int indiceMenor = findClosest();
+            if (indiceMenor < 0) continue;
             nos.get(indiceMenor).setFoiVisitado(true);
             updateNearNodes(indiceMenor, ordenacao);
         }
@@ -63,12 +76,12 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
     }
     protected int findClosest()
     {
-        NoGrafo<Dado> menor = null;
         int indiceAtual = 0, indiceMenor = -1;
+        double minDist = Double.POSITIVE_INFINITY;
         for (NoGrafo<Dado> no : nos) {
-            if (!no.foiVisitado() && no.getDistancia() != -1 && (menor == null || no.getDistancia() < menor.getDistancia())) {
-                menor = no;
+            if (!no.foiVisitado() && no.getDistancia() != -1 && no.getDistancia() <= minDist) {
                 indiceMenor = indiceAtual;
+                minDist = no.getDistancia();
             }
             indiceAtual++;
         }
@@ -93,10 +106,12 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
             NoGrafo<Dado> atual = nos.get(i);
             if (!atual.foiVisitado())
             {
-                Object atualAteProximo = adj[indiceMenor][i].get(ordenacao);
+                Object atualAteProximo = adj[indiceMenor][i] != null?adj[indiceMenor][i].get(ordenacao):null;
+                if (atualAteProximo == null) continue;
                 if (!(atualAteProximo instanceof Number))
                     break;
-                Double distancia = nos.get(indiceMenor).getDistancia() + (Double)atualAteProximo;
+
+                double distancia = ((Number)atualAteProximo).doubleValue() + nos.get(indiceMenor).getDistancia();
 
                 if (distancia < atual.getDistancia())
                 {
@@ -112,7 +127,7 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         ListaSimples<Path<Dado>> paths = new ListaSimples<>();
 
         for(int i = 0; i < qtdParams; i++)
-            if (!(demonstracaoParams.get(i) instanceof Number))
+            if (demonstracaoParams.get(i) instanceof Number)
                 paths.add(getPath(c1, c2, i));
 
         return paths;

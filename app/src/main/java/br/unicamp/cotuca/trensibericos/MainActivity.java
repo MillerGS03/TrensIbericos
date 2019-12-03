@@ -247,7 +247,8 @@ public class MainActivity extends AppCompatActivity {
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
-                ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
+                //ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
+                ListaSimples<Path<Cidade>> res = grafo.getPaths(29, 47);
                 ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
                 for (Path<Cidade> path : res) {
