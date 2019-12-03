@@ -8,6 +8,7 @@ package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
 
+// Nó da lista
 public class No<T> implements Serializable
 {
     No prox;

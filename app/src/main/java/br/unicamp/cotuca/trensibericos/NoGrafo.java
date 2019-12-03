@@ -8,6 +8,7 @@ package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
 
+// O nó do grafo é uma fusão das classes Vertice e DistOriginal
 public class NoGrafo<Dado extends Serializable & Comparable<Dado>> implements Serializable, Comparable<NoGrafo<Dado>> {
     protected Dado dado;
     protected NoGrafo<Dado> anterior;

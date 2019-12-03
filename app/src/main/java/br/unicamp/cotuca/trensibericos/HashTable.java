@@ -15,6 +15,8 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
     protected int qtdDados;
     protected Class<? extends Dado> classe;
 
+    // A classe é passada em ambos os construtores, pois é necessário obter o hashcode da chave e não é possível criar métodos estáticos abstratos
+    // Portanto, é necessário criar uma instância (usando a classe.newInstance()) e chamar o "getKeyHashcode", que não é estático.
     public HashTable(int tamanho, Class<? extends Dado> c)
     {
         vet = new ListaHash[tamanho];
@@ -32,11 +34,12 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
     {
         try {
             Dado dado = classe.newInstance();
-            long ret = dado.getKeyHashcode(key);
+            long ret = dado.getKeyHashcode(key); // Pega o hashCode da chave. Não usamos o padrão "getHashcode()" porque o usuário pode
+                                                // querer fazer o próprio hashCode de uma classe já existente, como uma String (nosso caso)
 
             ret %= vet.length - 1;
 
-            return (int) Math.abs(ret);
+            return (int) Math.abs(ret); // retorna o índice do vetor onde o dado precisa estar
         } catch (Exception ex) {
             return -1;
         }
@@ -48,7 +51,7 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
         ListaHash lista = vet[index];
 
         if (lista == null)
-            lista = new ListaHash();
+            lista = new ListaHash(); // Como é BucketHash, os dados são adicionados numa lista para evitar que sejam sobrescritos
 
         lista.add(dado);
 
@@ -65,10 +68,10 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
         if (lista == null)
             return null;
 
-        return (Dado)lista.find(key);
+        return (Dado)lista.find(key); // Procura na lista daquela posição o dado correspondente àquela chave e retorna
     }
 
-    public ListaHash[] getVetor()
+    public ListaHash[] getVetor() // Transforma a hashTable em um vetor, com os dados em ordem
     {
         ListaHash[] arr = new ListaHash[qtdDados];
         int ind = 0;
@@ -87,7 +90,8 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
         return ret;
     }
 
-    public ListaSimples<Key> getKeys() {
+    public ListaSimples<Key> getKeys() // Retorna todas as chaves
+    {
         ListaSimples<Key> keys = new ListaSimples<>();
         ListaHash[] arr = getVetor();
         for(ListaHash<Dado, Key> lista : arr) {
@@ -98,7 +102,7 @@ public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> &
         return keys;
     }
 
-    public ListaSimples<Key> getKeys(Predicate<Dado> predicate)
+    public ListaSimples<Key> getKeys(Predicate<Dado> predicate) // Retorna apenas as chaves dos dados que cumprem certo requisito
     {
         ListaSimples<Key> keys = new ListaSimples<>();
         ListaHash[] arr = getVetor();

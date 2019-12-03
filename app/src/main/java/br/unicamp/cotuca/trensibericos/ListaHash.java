@@ -8,7 +8,10 @@ package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
 
+// Lista necessária para o BucketHash. Ela herda de ListaSimples, e portanto tem todos os seus métodos
 public class ListaHash<Dado extends Hashable<Key>, Key extends Comparable<Key> & Serializable> extends ListaSimples<Dado> implements Serializable {
+    
+    // Remove o dado correspondente àquela chave
     public void remove(Key key)
     {
         if (comeco == null)
@@ -32,6 +35,7 @@ public class ListaHash<Dado extends Hashable<Key>, Key extends Comparable<Key> &
         }
     }
 
+    // Procura o dado correspondente àquela chave
     public Dado find(Key key)
     {
         if (key.equals(comeco.getInfo().getKey()))
