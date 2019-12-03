@@ -95,9 +95,12 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         int indiceAnterior = end;
         path.getPath().addToBeginning(atual.getDado());
         while ((atual = atual.getAnterior()) != null) {
-            path.getPath().addToBeginning(atual.getDado());
-            path.getParams().addValues(adj[atual.getIndice()][indiceAnterior]);
-            indiceAnterior = atual.getIndice();
+            ListaSimples lista = adj[atual.getIndice()][indiceAnterior];
+            if (lista != null) {
+                path.getPath().addToBeginning(atual.getDado());
+                path.getParams().addValues(lista);
+                indiceAnterior = atual.getIndice();
+            }
         }
     }
     protected void updateNearNodes(int indiceMenor, int ordenacao)
