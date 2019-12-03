@@ -13,12 +13,14 @@ import android.view.ViewGroup;
 
 
 public class CanvasMapa extends View {
-    private Context contexto;
-    private HashTable<Cidade, String> cidades;
-    private Bitmap background;
-    private View parent;
-    private ListaSimples<Caminho> caminhos;
-    private int corPadrao = Color.BLUE;
+    protected Context contexto;
+    protected HashTable<Cidade, String> cidades;
+    protected Bitmap background;
+    protected View parent;
+    protected ListaSimples<Caminho> caminhos;
+    protected Caminho caminhoAtual;
+    protected int corPadrao = Color.BLUE;
+    protected int principal = 0;
 
     public CanvasMapa(Context context) {
         super(context);
@@ -33,8 +35,19 @@ public class CanvasMapa extends View {
     }
     public void setCaminhos(ListaSimples<Caminho> caminhos)
     {
-        this.caminhos = caminhos;
+        if (caminhos != null && caminhos.getSize() > 0) {
+            this.caminhos = caminhos;
+            caminhoAtual = caminhos.get(0);
+        }
+        else if (this.caminhos != null)
+            this.caminhos.reset();
         invalidate();
+    }
+    public void setPrincipal(int p) {
+        principal = p;
+    }
+    public Caminho getCaminhoAtual() {
+        return caminhoAtual;
     }
 
     private void redimensionar()
@@ -77,26 +90,41 @@ public class CanvasMapa extends View {
 
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(5f);
+        paint.setColor(Color.argb(0x66, 161, 161, 161));
+
+        int ind = 0;
 
         for (Caminho caminho : caminhos) {
-            if (caminho.isPrincipal())
-                paint.setColor(corPadrao);
-            else
-                paint.setColor(Color.rgb(161, 161, 161));
-
             ListaSimples<Cidade> cidades = caminho.getCidades();
+            if (ind != principal) {
+                for (Cidade cidade : cidades) {
+                    x2 = cidade.getX() * getWidth();
+                    y2 = cidade.getY() * getHeight();
 
-            for (Cidade cidade : cidades) {
-                x2 = cidade.getX() * getWidth();
-                y2 = cidade.getY() * getHeight();
+                    if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1)
+                        canvas.drawLine(x1, y1, x2, y2, paint);
 
-                if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1)
-                    canvas.drawLine(x1, y1, x2, y2, paint);
-
-                x1 = cidade.getX() * getWidth();
-                y1 = cidade.getY() * getHeight();
+                    x1 = cidade.getX() * getWidth();
+                    y1 = cidade.getY() * getHeight();
+                }
             }
+            else
+                caminhoAtual = caminho;
             x1 = y1 = x2 = y2 = -1;
+            ind++;
+        }
+
+        paint.setColor(corPadrao);
+
+        for (Cidade cidade : caminhoAtual.getCidades()) {
+            x2 = cidade.getX() * getWidth();
+            y2 = cidade.getY() * getHeight();
+
+            if (x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1)
+                canvas.drawLine(x1, y1, x2, y2, paint);
+
+            x1 = cidade.getX() * getWidth();
+            y1 = cidade.getY() * getHeight();
         }
     }
 

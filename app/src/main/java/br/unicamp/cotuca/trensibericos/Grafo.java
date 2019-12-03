@@ -1,8 +1,5 @@
 package br.unicamp.cotuca.trensibericos;
 
-import android.content.Intent;
-import android.util.Log;
-
 import java.io.Serializable;
 
 public class Grafo<Dado extends Serializable & Comparable<Dado>> {
@@ -11,6 +8,7 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
 
     protected ListaSimples<NoGrafo<Dado>> nos;
     protected ListaSimples[][] adj;
+    protected ListaSimples<Object> demonstracaoParams = null;
 
     public void setDados(ListaSimples<Dado> dados) {
         qtdDados = dados.getSize();
@@ -38,15 +36,11 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         nos = new ListaSimples<>();
     }
     protected void resetarNos(int inicio, int ordenacao) {
-        for(NoGrafo<Dado> no : nos) {
-            no.setFoiVisitado(false);
-        }
         NoGrafo<Dado> comeco = nos.get(inicio);
-        comeco.setFoiVisitado(true);
-
         int ind = 0;
 
         for(NoGrafo<Dado> no : nos) {
+            no.setFoiVisitado(false);
             no.setAnterior(comeco);
             ListaSimples lista = adj[inicio][ind];
             if (lista != null)
@@ -55,6 +49,8 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
                 no.setDistancia(Double.POSITIVE_INFINITY);
             ind++;
         }
+
+        comeco.setFoiVisitado(true);
         comeco.setAnterior(null);
     }
 
@@ -73,6 +69,8 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
 
         buildPath(path, c2);
 
+        if (path.getPath().getSize() == 0)
+            return null;
         return path;
     }
     protected int findClosest()
@@ -100,6 +98,9 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
                 path.getPath().addToBeginning(atual.getDado());
                 path.getParams().addValues(lista);
                 indiceAnterior = atual.getIndice();
+            } else {
+                path.getPath().reset();
+                break;
             }
         }
     }
@@ -127,7 +128,6 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         }
     }
 
-    ListaSimples<Object> demonstracaoParams = null;
     public ListaSimples<Path<Dado>> getPaths(int c1, int c2) {
         ListaSimples<Path<Dado>> paths = new ListaSimples<>();
 

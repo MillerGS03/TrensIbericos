@@ -83,6 +83,53 @@
                     android:text="Buscar"/>
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp">
+                <Button
+                    android:id="@+id/btnCurto"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Caminho mais curto"
+                    android:textSize="18dp"
+                    android:visibility="invisible"/>
+                <Button
+                    android:id="@+id/btnRapido"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:text="Caminho mais rápido"
+                    android:textSize="18dp"
+                    android:visibility="invisible"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:id="@+id/tvDistancia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="16sp"
+                    android:layout_marginHorizontal="20dp"/>
+                <TextView
+                    android:id="@+id/tvTempo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="16sp"
+                    android:layout_marginHorizontal="20dp"/>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </FrameLayout>

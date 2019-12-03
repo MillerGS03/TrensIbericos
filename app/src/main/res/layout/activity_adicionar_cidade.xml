@@ -71,13 +71,26 @@
                 android:textSize="30dp"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnAdd"
-            android:layout_width="175dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:textSize="20dp"
-            android:text="Adicionar Cidade"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="40dp">
+            <Button
+                android:id="@+id/btnVoltar"
+                android:layout_width="175dp"
+                android:layout_height="match_parent"
+                android:text="Voltar"
+                android:textSize="20dp"
+                android:layout_marginHorizontal="10dp"/>
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:text="Adicionar Cidade"
+                android:layout_marginHorizontal="10dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -6,7 +6,6 @@ import java.util.Objects;
 public class Caminho extends Hashable<Caminho, String> {
     private ListaSimples<Cidade> cidades;
     private double distancia, tempo;
-    private boolean principal;
 
     public double getDistancia()
     {
@@ -80,9 +79,9 @@ public class Caminho extends Hashable<Caminho, String> {
             format += "%-15s";
             args[i] = cidades.get(i).getNome();
         }
-        format += "%4s %4s";
-        args[i++] = distancia;
-        args[i] = tempo;
+        format += "%-4s %-4s";
+        args[i++] = Math.round(distancia);
+        args[i] = Math.round(tempo);
         return String.format(Locale.FRANCE, format, args);
     }
 
@@ -97,13 +96,6 @@ public class Caminho extends Hashable<Caminho, String> {
 
     public int hashCode() {
         return Objects.hash(getCidades(), getDistancia(), getTempo());
-    }
-
-    public boolean isPrincipal() {
-        return principal;
-    }
-    public void setPrincipal(boolean principal) {
-        this.principal = principal;
     }
 
     public String getKey()

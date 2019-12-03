@@ -20,9 +20,10 @@ import java.io.OutputStreamWriter;
 public class AdicionarCaminhoActivity extends AppCompatActivity {
     LinearLayout llConteudo;
     EditText edtCidade1, edtCidade2, edtDistancia, edtTempo;
-    Button btnAdd;
+    Button btnAdd, btnVoltar;
 
     HashTable<Cidade, String> cidades;
+    ListaSimples<Caminho> caminhosAtuais;
 
     String cidade1, cidade2;
     int dist, tempo;
@@ -62,12 +63,14 @@ public class AdicionarCaminhoActivity extends AppCompatActivity {
         edtDistancia = (EditText)findViewById(R.id.edtDistancia);
         edtTempo = (EditText)findViewById(R.id.edtTempo);
         btnAdd = (Button)findViewById(R.id.btnAdd);
+        btnVoltar = (Button)findViewById(R.id.btnVoltar);
 
         iniciarFullscreen();
 
         Intent intent = getIntent();
         Bundle params = intent.getExtras();
         cidades = (HashTable<Cidade, String>) params.getSerializable("cidades");
+        caminhosAtuais = (ListaSimples<Caminho>) params.getSerializable("caminhos");
 
         llConteudo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,27 +86,37 @@ public class AdicionarCaminhoActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOk())
+                Caminho caminho;
+                if ((caminho = getCaminho()) != null)
                 {
-                    Caminho caminho = new Caminho(cidades.get(cidade1), cidades.get(cidade2), dist, tempo);
-
                     try {
                         OutputStreamWriter escrevedor = new OutputStreamWriter(openFileOutput("GrafoTremEspanhaPortugal.txt", Context.MODE_APPEND));
-                        escrevedor.append(caminho.toString());
+                        escrevedor.append(caminho.toString() + "\n");
                         escrevedor.flush();
                         escrevedor.close();
                     }
                     catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        Intent intent = new Intent(AdicionarCaminhoActivity.this, MainActivity.class);
+                        startActivity(intent);
                     }
                 } else {
                     Toast.makeText(AdicionarCaminhoActivity.this, "Preencha os campos corretamente!", Toast.LENGTH_LONG).show();
                 }
             }
         });
+
+        btnVoltar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdicionarCaminhoActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-    private boolean isOk()
+    private Caminho getCaminho()
     {
         try {
             cidade1 = edtCidade1.getText().toString().trim();
@@ -111,18 +124,26 @@ public class AdicionarCaminhoActivity extends AppCompatActivity {
             dist = Integer.parseInt(edtDistancia.getText().toString().trim());
             tempo = Integer.parseInt(edtTempo.getText().toString().trim());
 
+            Caminho caminho = new Caminho(cidades.get(cidade1), cidades.get(cidade2), dist, tempo);
+
             if (dist <= 0 || tempo <= 0)
-                return false;
+                return null;
 
             if (cidade1.equals("") || cidade2.equals(""))
-                return false;
+                return null;
 
             if (cidade1.length() > 15 || cidade2.length() > 15)
-                return false;
+                return null;
 
-            return true;
+            for (Caminho c : caminhosAtuais) {
+                if (c.getCidades().equals(caminho.getCidades())) {
+                    return null;
+                }
+            }
+
+            return caminho;
         } catch (Exception ex) {
-            return false;
+            return null;
         }
     }
 }

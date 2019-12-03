@@ -1,17 +1,12 @@
 package br.unicamp.cotuca.trensibericos;
 
-import android.annotation.SuppressLint;
-
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -20,21 +15,18 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
 
 
 public class AdicionarCidadeActivity extends AppCompatActivity {
+    HashTable<Cidade, String> cidades;
 
     LinearLayout llConteudo;
     EditText edtNome, edtX, edtY;
-    Button btnAdd;
+    Button btnAdd, btnVoltar;
 
     String nome;
     float x, y;
@@ -73,6 +65,7 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         edtX = (EditText)findViewById(R.id.edtX);
         edtY = (EditText)findViewById(R.id.edtY);
         btnAdd = (Button)findViewById(R.id.btnAdd);
+        btnVoltar = (Button)findViewById(R.id.btnVoltar);
 
         iniciarFullscreen();
 
@@ -87,26 +80,34 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
             }
         });
 
+        Bundle params = getIntent().getExtras();
+        cidades = (HashTable<Cidade, String>) params.getSerializable("cidades");
+
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isOk())
+                Cidade cidade = getCidade();
+                if (cidade != null)
                 {
-                    Cidade cidade = new Cidade(-1, nome, x, y);
-
                     try {
-                        cidade.setId(getLastId() + 1);
-
                         adicionarCidade(cidade);
-
+                    } catch (Exception ex) {
+                        Toast.makeText(AdicionarCidadeActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+                    } finally {
                         Intent intent = new Intent(AdicionarCidadeActivity.this, MainActivity.class);
                         startActivity(intent);
-                    } catch (IOException ex) {
-                        Toast.makeText(AdicionarCidadeActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(AdicionarCidadeActivity.this, "Preencha os campos corretamente!", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        btnVoltar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdicionarCidadeActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -132,31 +133,42 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         return -2;
     }
 
-    private boolean isOk()
+    private Cidade getCidade()
     {
         try {
             nome = edtNome.getText().toString();
             x = Float.parseFloat(edtX.getText().toString());
             y = Float.parseFloat(edtY.getText().toString());
 
+            Cidade cidade = new Cidade(-1, nome, x, y);
+
             if (nome.trim().equals(""))
-                return false;
+                return null;
 
             if (x > 1 || x < 0)
-                return false;
+                return null;
 
             if (y > 1 || y < 0)
-                return false;
+                return null;
 
-            return true;
-        } catch (Exception e) {return false;}
+            for (ListaHash<Cidade, String> lista : cidades.getVetor()) {
+                for (Cidade c : lista) {
+                    if (c.getNome().equals(nome))
+                        return null;
+                }
+            }
+
+            cidade.setId(getLastId() + 1);
+
+            return cidade;
+        } catch (IOException e) {return null;}
     }
 
     private void adicionarCidade(Cidade cidade)
     {
         try {
             OutputStreamWriter escrevedor = new OutputStreamWriter(openFileOutput("Cidades.txt", Context.MODE_APPEND));
-            escrevedor.append(cidade.toString());
+            escrevedor.append(cidade.toString() + "\n");
             escrevedor.flush();
             escrevedor.close();
         }

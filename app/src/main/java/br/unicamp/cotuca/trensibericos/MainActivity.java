@@ -5,37 +5,30 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import java.beans.*;
 import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     LinearLayout llMapa;
     FrameLayout conteudo;
-    Button btnAddCidade, btnAddCaminho, btnBuscar;
+    Button btnAddCidade, btnAddCaminho, btnBuscar, btnCurto, btnRapido;
     Spinner sDe, sPara;
+    TextView tvDistancia, tvTempo;
 
     CanvasMapa mapa;
     Grafo<Cidade> grafo;
@@ -186,6 +179,10 @@ public class MainActivity extends AppCompatActivity {
         sDe = (Spinner)findViewById(R.id.spinnerDe);
         sPara = (Spinner)findViewById(R.id.spinnerPara);
         btnBuscar = (Button)findViewById(R.id.btnBuscar);
+        btnCurto = (Button)findViewById(R.id.btnCurto);
+        btnRapido = (Button)findViewById(R.id.btnRapido);
+        tvDistancia = (TextView)findViewById(R.id.tvDistancia);
+        tvTempo = (TextView)findViewById(R.id.tvTempo);
 
         iniciarFullscreen();
 
@@ -195,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         grafo = new Grafo<>();
 
         HashTable<Cidade, String> cidades = new HashTable<>(Cidade.class);
+        ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
         try {
             resetarArquivos();
@@ -203,16 +201,17 @@ public class MainActivity extends AppCompatActivity {
             cidades = getCidades(listaCidades);
             grafo.setDados(listaCidades);
 
-            ListaSimples<Caminho> caminhos = getCaminhos(cidades);
+            caminhos = getCaminhos(cidades);
             for (Caminho caminho : caminhos) {
                 grafo.setLigacao(caminho.getCidades().get(0).getId(), caminho.getCidades().get(1).getId(),
                         caminho.getDistancia(), caminho.getTempo());
             }
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         final HashTable<Cidade, String> hashCidades = cidades;
+        final ListaSimples<Caminho> listaCaminhos = caminhos;
 
         mapa.setCidades(cidades);
 
@@ -225,6 +224,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AdicionarCidadeActivity.class);
+                Bundle params = new Bundle();
+                params.putSerializable("cidades", hashCidades);
+                intent.putExtras(params);
+
                 startActivity(intent);
             }
         });
@@ -235,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, AdicionarCaminhoActivity.class);
                 Bundle params = new Bundle();
                 params.putSerializable("cidades", hashCidades);
+                params.putSerializable("caminhos", listaCaminhos);
                 intent.putExtras(params);
 
                 startActivity(intent);
@@ -244,24 +248,57 @@ public class MainActivity extends AppCompatActivity {
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnRapido.setVisibility(View.INVISIBLE);
+                btnCurto.setVisibility(View.INVISIBLE);
+                tvDistancia.setText("");
+                tvTempo.setText("");
+                mapa.setCaminhos(null);
+
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
                 ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
-                ListaSimples<Caminho> caminhos = new ListaSimples<>();
-
-                for (Path<Cidade> path : res) {
-                    Caminho caminho = new Caminho();
-                    caminho.setCidades(path.getPath());
-                    caminho.setDistancia((double)path.getParams().get(0));
-                    caminho.setTempo((double)path.getParams().get(1));
-                    caminhos.add(caminho);
+                if (res.getSize() > 0) {
+                    exibirCaminhos(res);
+                    btnRapido.setVisibility(View.VISIBLE);
+                    btnCurto.setVisibility(View.VISIBLE);
+                    tvDistancia.setText("Distância: " + mapa.getCaminhoAtual().getDistancia());
+                    tvTempo.setText("Tempo: " + mapa.getCaminhoAtual().getTempo());
+                } else {
+                    Toast.makeText(MainActivity.this, "Não foram encontrados caminhos de " + c1 + " para " + c2, Toast.LENGTH_LONG).show();
                 }
-
-                caminhos.get(0).setPrincipal(true);
-
-                mapa.setCaminhos(caminhos);
             }
         });
+
+        btnCurto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapa.setPrincipal(0);
+                tvDistancia.setText("Distância: " + mapa.getCaminhoAtual().getDistancia());
+                tvTempo.setText("Tempo: " + mapa.getCaminhoAtual().getTempo());
+            }
+        });
+
+        btnRapido.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapa.setPrincipal(1);
+                tvDistancia.setText("Distância: " + mapa.getCaminhoAtual().getDistancia());
+                tvTempo.setText("Tempo: " + mapa.getCaminhoAtual().getTempo());
+            }
+        });
+    }
+
+    private void exibirCaminhos(ListaSimples<Path<Cidade>> res) {
+        ListaSimples<Caminho> caminhos = new ListaSimples<>();
+        for (Path<Cidade> path : res) {
+            Caminho caminho = new Caminho();
+            caminho.setCidades(path.getPath());
+            caminho.setDistancia((double)path.getParams().get(0));
+            caminho.setTempo((double)path.getParams().get(1));
+            caminhos.add(caminho);
+        }
+
+        mapa.setCaminhos(caminhos);
     }
 }

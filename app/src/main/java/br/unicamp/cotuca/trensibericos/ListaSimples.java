@@ -7,20 +7,27 @@ import java.util.Iterator;
 import java.util.Optional;
 
 public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
-    protected No<Dado> comeco, fim;
+    protected No<Dado> comeco, fim, atual;
     private int qtd;
+    private int index;
 
     public ListaSimples()
     {
+        index = 0;
         comeco = null;
+        atual = null;
     }
     public ListaSimples(Dado... vet) {
         for (Dado dado : vet)
             add(dado);
+        index = 0;
+        atual = comeco;
     }
 
     public void add(Dado dado)
     {
+        if (dado == null)
+            return;
         No<Dado> no = new No<>(dado, null);
         if (comeco == null)
             comeco = no;
@@ -39,36 +46,22 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
         qtd++;
     }
 
-    public void remove(int index) {
-        if (comeco == null) return;
-        if (index == 0)
-        {
-            comeco = comeco.getProx();
-            return;
+    protected void getNode(int index) {
+        if (index < this.index) {
+            this.index = 0;
+            atual = comeco;
         }
-        int i = 0;
-        No<Dado> no, ant;
-        for(no = comeco.getProx(), ant = comeco; no != null && i != index; ant = no, no = no.getProx(), i++) {}
-        if (no == null) return;
-        ant.setProx(no.getProx());
-    }
-
-    protected No<Dado> getNode(int index) {
-        int i = 0;
-        No<Dado> no;
-        for(no = comeco; no != null && i != index; no = no.getProx(), i++) {}
-        return no;
+        if (atual == null)
+            atual = comeco;
+        for(; atual != null && this.index < index; atual = atual.getProx(), this.index++) {}
     }
 
     public Dado get(int index)
     {
-        No<Dado> no = getNode(index);
-        if (no != null)
-            return no.getInfo();
+        getNode(index);
+        if (atual != null)
+            return atual.getInfo();
         return null;
-    }
-    public void set(Dado data, int index) {
-        getNode(index).setInfo(data);
     }
 
     public void addValues(ListaSimples<Dado> l) {
@@ -78,7 +71,7 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
         while (no1 != null && no2 != null) {
             Dado info1 = no1.getInfo();
             Dado info2 = no2.getInfo();
-            Object set = info1;
+            Object set;
 
             if (info1 instanceof Character && info2 instanceof Character) {
                 set = ((Character)info1) + ((Character)info2);
@@ -116,6 +109,12 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
         if (ret.length() > 2)
             ret = ret.substring(0, ret.length() - 2);
         return ret;
+    }
+
+    public void reset() {
+        comeco = fim = null;
+        qtd = 0;
+        atual = null;
     }
 
     public Dado[] toArray(Class<? extends Dado[]> classe)
