@@ -1,8 +1,14 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
 
-public class ListaHash<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> extends ListaSimples<Dado> implements Serializable {
+public class ListaHash<Dado extends Hashable<Key>, Key extends Comparable<Key> & Serializable> extends ListaSimples<Dado> implements Serializable {
     public void remove(Key key)
     {
         if (comeco == null)

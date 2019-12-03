@@ -1,10 +1,17 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import java.util.Locale;
 import java.util.Objects;
 
-public class Caminho extends Hashable<Caminho, String> {
-    private ListaSimples<Cidade> cidades;
+//classe do Caminho
+public class Caminho{
+    private ListaSimples<Cidade> cidades; //lista de cidades que pertencem a esse caminho
     private double distancia, tempo;
 
     public double getDistancia()
@@ -55,33 +62,43 @@ public class Caminho extends Hashable<Caminho, String> {
         setTempo(t);
     }
 
-    public Caminho(String linha, HashTable<Cidade, String> hashCidades)
+    public Caminho(String linha, HashTable<Cidade, String> hashCidades) //construtor a partir de linha do arquivo texto
     {
         cidades = new ListaSimples<Cidade>();
-        String[] blocos = new String[(int)Math.ceil((float)linha.length()/15)];
+
         for (int i = 0; i < linha.length(); i += 15) {
-            String atual = linha.substring(i, Math.min(linha.length(), i + 15));
-            if (linha.length() - i > 15) {
+            String atual = linha.substring(i, Math.min(linha.length(), i + 15)); //blocos de 15 caracteres são lidos da linha e armazenados em atual até que
+            //não haja mais 15 caracteres para serem lidos
+
+            //cada bloco de 15 caracteres representa o nome de uma cidade que deve ser pesquisado na HashTable passada como parâmetro para, depois, ser adicionada
+            //à lista de cidades desse caminho
+
+            if (linha.length() - i > 15) { //se houver mais 15 caracteres para serem lidos
                 cidades.add(hashCidades.get(atual.trim()));
-            } else {
+            } else { //se não houver, o que falta ler é a distância e tempo do caminho
                 distancia = Integer.parseInt(atual.substring(0, 5).trim());
                 tempo = Integer.parseInt(atual.substring(5).trim());
             }
         }
     }
 
+    //caminho é formatado para ser escrito no arquivo texto
     public String toString()
     {
         String format = "";
         Object[] args = new Object[2 + cidades.getSize()];
         int i;
+
         for (i = 0; i < cidades.getSize(); i++) {
             format += "%-15s";
             args[i] = cidades.get(i).getNome();
         }
+
         format += "%-4s %-4s";
+
         args[i++] = Math.round(distancia);
         args[i] = Math.round(tempo);
+
         return String.format(Locale.FRANCE, format, args);
     }
 
@@ -92,21 +109,5 @@ public class Caminho extends Hashable<Caminho, String> {
         return getDistancia() == caminho.getDistancia() &&
                 getTempo() == caminho.getTempo() &&
                 getCidades().equals(caminho.getCidades());
-    }
-
-    public int hashCode() {
-        return Objects.hash(getCidades(), getDistancia(), getTempo());
-    }
-
-    public String getKey()
-    {
-        return toString();
-    }
-    public long getKeyHashcode(String hash) {
-        long ret = 88;
-        for(byte b : hash.getBytes()) {
-            ret = 7 * ret + b;
-        }
-        return ret;
     }
 }

@@ -1,3 +1,9 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import android.content.Context;
@@ -12,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
+//classe que representa o Mapa na GUI
 public class CanvasMapa extends View {
     protected Context contexto;
     protected HashTable<Cidade, String> cidades;
@@ -25,6 +32,7 @@ public class CanvasMapa extends View {
     public CanvasMapa(Context context) {
         super(context);
         contexto = context;
+        //background é a imagem "mapa.png" na pasta drawable
         background = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier("mapa", "drawable", context.getPackageName()));
     }
 
@@ -35,21 +43,23 @@ public class CanvasMapa extends View {
     }
     public void setCaminhos(ListaSimples<Caminho> caminhos)
     {
-        if (caminhos != null && caminhos.getSize() > 0) {
+        if (caminhos != null && caminhos.getSize() > 0) { //se os caminhos forem válidos, adicioná-los
             this.caminhos = caminhos;
-            caminhoAtual = caminhos.get(0);
+            caminhoAtual = caminhos.get(0); //caminho atual é o primeiro caminho, por padrão
         }
-        else if (this.caminhos != null)
-            this.caminhos.reset();
+        else if (this.caminhos != null) //se os caminhos passados forem inválidos e os caminhos atuais forem válidos
+            this.caminhos.reset(); //caminhos atuais são resetados (lista é limpa)
+
         invalidate();
     }
     public void setPrincipal(int p) {
         principal = p;
-    }
+    } //caminho principal que aparecerá com uma cor diferente
     public Caminho getCaminhoAtual() {
         return caminhoAtual;
-    }
+    } //caminho atual, que é o principal
 
+    //redimensiona os componentes para manterem a razão da imagem do mapa
     private void redimensionar()
     {
         Matrix m = new Matrix();
@@ -61,6 +71,8 @@ public class CanvasMapa extends View {
         lp.height = background.getHeight();
         parent.setLayoutParams(lp);
     }
+
+    //desenha pontos no mapa para as cordenadas das cidades
     public void desenharPontosCidades(Canvas canvas)
     {
         canvas.save();
@@ -71,15 +83,17 @@ public class CanvasMapa extends View {
         if (cidades == null)
             return;
 
-        ListaSimples[] listas = cidades.getVetor();
+        ListaSimples[] listas = cidades.getVetor(); //retorna um vetor de ListaHash da HashTable e, por polimorfismo, o vetor é lido como ListaSimples[]
 
         for(ListaSimples<Cidade> lista : listas) {
-            for (Cidade cidade : lista)
+            for (Cidade cidade : lista) //pra cada cidade em cada lista
                 canvas.drawCircle(getWidth() * cidade.getX(), getHeight() * cidade.getY(), 5, paint);
         }
 
         canvas.restore();
     }
+
+    //desenha os caminhos entre as cidades
     public void desenharCaminhos(Canvas canvas)
     {
         if (caminhos == null)
@@ -95,8 +109,8 @@ public class CanvasMapa extends View {
         int ind = 0;
 
         for (Caminho caminho : caminhos) {
-            ListaSimples<Cidade> cidades = caminho.getCidades();
-            if (ind != principal) {
+            ListaSimples<Cidade> cidades = caminho.getCidades(); //lista com as cidades de cada caminho
+            if (ind != principal) { //se não for o caminho principal, desenhar normalmente (com um cinza meio transparente)
                 for (Cidade cidade : cidades) {
                     x2 = cidade.getX() * getWidth();
                     y2 = cidade.getY() * getHeight();
@@ -108,7 +122,7 @@ public class CanvasMapa extends View {
                     y1 = cidade.getY() * getHeight();
                 }
             }
-            else
+            else //se ofr o caminho principal, guardar no caminhoAtual
                 caminhoAtual = caminho;
             x1 = y1 = x2 = y2 = -1;
             ind++;
@@ -116,7 +130,7 @@ public class CanvasMapa extends View {
 
         paint.setColor(corPadrao);
 
-        for (Cidade cidade : caminhoAtual.getCidades()) {
+        for (Cidade cidade : caminhoAtual.getCidades()) { //desenhar o caminhoAtual com uma cor diferenciada
             x2 = cidade.getX() * getWidth();
             y2 = cidade.getY() * getHeight();
 

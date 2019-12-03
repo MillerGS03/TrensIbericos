@@ -1,3 +1,9 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;

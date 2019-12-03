@@ -1,3 +1,9 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,36 +30,40 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class MainActivity extends AppCompatActivity {
+    //objetos da GUI
     LinearLayout llMapa;
     FrameLayout conteudo;
     Button btnAddCidade, btnAddCaminho, btnBuscar, btnCurto, btnRapido;
     Spinner sDe, sPara;
     TextView tvDistancia, tvTempo;
 
-    CanvasMapa mapa;
+    CanvasMapa mapa; //objeto que representa o mapa na GUI
     Grafo<Cidade> grafo;
 
     //region operacoes IO
 
+    //reseta os arquivos do armazenamento interno com base nos arquivos fornecidos para o projeto que se encontram na pasta assets
     private void resetarArquivos() throws IOException
     {
         for(File file : getFilesDir().listFiles())
             file.delete();
 
-        OutputStreamWriter escrevedor = new OutputStreamWriter(openFileOutput("Cidades.txt", Context.MODE_PRIVATE));
+        OutputStreamWriter escrevedor = new OutputStreamWriter(openFileOutput("Cidades.txt", Context.MODE_PRIVATE)); //arquivo do armazenamento interno é aberto para escrita
         String data = "";
 
-        BufferedReader leitor = new BufferedReader(new InputStreamReader(getAssets().open("Cidades.txt")));
+        BufferedReader leitor = new BufferedReader(new InputStreamReader(getAssets().open("Cidades.txt"))); //arquivo do assets é aberto para leitura
         String linha = "";
 
-        while ((linha = leitor.readLine()) != null) {
+        while ((linha = leitor.readLine()) != null) { //para cada linha lida, adiciona-se à data
             data += linha + "\n";
         }
 
+        //ao final do while, data contém todo o arquivo de assets
         escrevedor.write(data);
         escrevedor.flush();
         escrevedor.close();
 
+        //a mesma coisa é feita, porém com o arquivo de ligações
         escrevedor = new OutputStreamWriter(openFileOutput("GrafoTremEspanhaPortugal.txt", Context.MODE_PRIVATE));
         data = "";
 
@@ -69,20 +79,21 @@ public class MainActivity extends AppCompatActivity {
         escrevedor.close();
     }
 
+    //retorna as cidades e adiciona-as na lista passada como parâmetro
     public HashTable<Cidade, String> getCidades(ListaSimples<Cidade> listaCidades)
     {
-        HashTable<Cidade, String> ret = new HashTable<>(Cidade.class);
+        HashTable<Cidade, String> ret = new HashTable<>(Cidade.class); //instancia da HashTable
         BufferedReader leitor = null;
 
         try {
-            InputStream is = openFileInput("Cidades.txt");
+            InputStream is = openFileInput("Cidades.txt"); //arquivo do armazenamento interno aberto
 
             if (is != null) {
-                leitor = new BufferedReader(new InputStreamReader(is, "UTF8"));
+                leitor = new BufferedReader(new InputStreamReader(is, "UTF8")); //formatação UTF8 para suportar acentos
                 String linha = "";
 
                 while ((linha = leitor.readLine()) != null) {
-                    Cidade c = new Cidade(linha);
+                    Cidade c = new Cidade(linha); //cada linha é transformada em uma cidade e adicionada tanto à hashTable quanto a lista passada como parâmetro
                     ret.add(c);
                     listaCidades.add(c);
                 }
@@ -92,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (FileNotFoundException ex) {
             try {
-                resetarArquivos();
+                resetarArquivos(); //caso o arquivo não exista, ele deve ser resetado (criado)
 
                 return getCidades(listaCidades);
             } catch (IOException ioEx) {
@@ -102,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        return ret;
+        return ret; //retorna a HashTable completa
     }
 
+    //retorna uma lista com todos os caminhos
     public ListaSimples<Caminho> getCaminhos(HashTable<Cidade, String> hash) {
         ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
@@ -118,14 +130,14 @@ public class MainActivity extends AppCompatActivity {
                 String linha = "";
 
                 while ((linha = leitor.readLine()) != null)
-                    caminhos.add(new Caminho(linha, hash));
+                    caminhos.add(new Caminho(linha, hash)); //cada linha contém uma ligação, ou seja, um caminho
 
                 is.close();
             }
         }
         catch (FileNotFoundException ex) {
             try {
-                resetarArquivos();
+                resetarArquivos(); //caso o arquivo não exista, criá-lo
 
                 return getCaminhos(hash);
             } catch (IOException ioEx) {
@@ -191,35 +203,38 @@ public class MainActivity extends AppCompatActivity {
 
         grafo = new Grafo<>();
 
-        HashTable<Cidade, String> cidades = new HashTable<>(Cidade.class);
-        ListaSimples<Caminho> caminhos = new ListaSimples<>();
+        HashTable<Cidade, String> cidades = new HashTable<>(Cidade.class); //HashTable de cidades iniciada
+        ListaSimples<Caminho> caminhos = new ListaSimples<>(); //Lista de caminhos iniciada
 
         try {
-            resetarArquivos();
-
-            ListaSimples<Cidade> listaCidades = new ListaSimples<Cidade>();
+            ListaSimples<Cidade> listaCidades = new ListaSimples<>();
             cidades = getCidades(listaCidades);
-            grafo.setDados(listaCidades);
+            grafo.setDados(listaCidades); //a lista de cidades preenhida é usada para adicionar as Cidades no grafo
 
-            caminhos = getCaminhos(cidades);
-            for (Caminho caminho : caminhos) {
+            caminhos = getCaminhos(cidades); //caminhos são lidos
+
+            for (Caminho caminho : caminhos) { //para cada caminho, criar uma ligação no grafo entre as respectivas cidades e passamos as variáveis de ordenação (distancia e tempo)
                 grafo.setLigacao(caminho.getCidades().get(0).getId(), caminho.getCidades().get(1).getId(),
                         caminho.getDistancia(), caminho.getTempo());
             }
         } catch (Exception ex) {
+            try {
+                resetarArquivos();
+            } catch (IOException e) {}
             ex.printStackTrace();
         }
 
-        final HashTable<Cidade, String> hashCidades = cidades;
+        final HashTable<Cidade, String> hashCidades = cidades; //constantes para serem usadas dentro de eventos
         final ListaSimples<Caminho> listaCaminhos = caminhos;
 
         mapa.setCidades(cidades);
 
-        ListaSimples<String> nomes = cidades.getKeys();
+        ListaSimples<String> nomes = cidades.getKeys(); //retorna os nomes de todas as cidades para serem adicionadas às listas da GUI (Spinners)
 
         sDe.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
         sPara.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
 
+        //abre a página de adição de cidade
         btnAddCidade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -232,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //abre a página de adição de caminho
         btnAddCaminho.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,21 +261,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //buscar os caminhos entre duas cidades escolhidas
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //GUI é resetada
                 btnRapido.setVisibility(View.INVISIBLE);
                 btnCurto.setVisibility(View.INVISIBLE);
                 tvDistancia.setText("");
                 tvTempo.setText("");
                 mapa.setCaminhos(null);
 
+                //nomes das cidades escolhidas
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
+                //pesquisa no grafo retornará dois Path<Cidade> em lista
+                //um para cada atributo de ordenação passado (distancia e tempo), caso haja caminho
                 ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
+
+                //se houver caminhos
                 if (res.getSize() > 0) {
-                    exibirCaminhos(res);
+                    exibirCaminhos(res); //eles são adicionados ao mapa
+                    //e, por padrão, o caminho mais curto é mostrado primeiro
                     btnRapido.setVisibility(View.VISIBLE);
                     btnCurto.setVisibility(View.VISIBLE);
                     tvDistancia.setText("Distância: " + mapa.getCaminhoAtual().getDistancia());
@@ -270,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //mostra o caminho mais curto e atualiza a GUI
         btnCurto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -279,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //mostra o caminho mais rápido e atualiza a GUI
         btnRapido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -289,12 +315,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //adiciona todos os Path<Cidade> retornados do grafo ao mapa
     private void exibirCaminhos(ListaSimples<Path<Cidade>> res) {
         ListaSimples<Caminho> caminhos = new ListaSimples<>();
+
         for (Path<Cidade> path : res) {
             Caminho caminho = new Caminho();
             caminho.setCidades(path.getPath());
-            caminho.setDistancia((double)path.getParams().get(0));
+            caminho.setDistancia((double)path.getParams().get(0)); //parametro 0 é distancia e 1 é tempo (ordem de passagem quando adicionamos ligações ao grafo
             caminho.setTempo((double)path.getParams().get(1));
             caminhos.add(caminho);
         }

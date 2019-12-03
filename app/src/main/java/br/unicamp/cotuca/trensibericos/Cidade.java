@@ -1,8 +1,15 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import java.util.Locale;
 
-public class Cidade extends Hashable<Cidade, String> {
+//classe Cidade que herda de Hashable<String> para poder ser tipo válido da HashTable
+public class Cidade extends Hashable<String> {
     public final int comecoId = 0;
     public final int fimId = 2;
     public final int comecoNome = fimId;
@@ -49,6 +56,7 @@ public class Cidade extends Hashable<Cidade, String> {
 
     public String toString()
     {
+        //id tem dois digitos, nome tem 16 e cordendas têm 3 casas decimais
         String s = String.format(Locale.FRANCE, "%2s%-16s%.3f %.3f", ""+getId(), getNome(), getX(), getY());
         return s;
     }
@@ -65,7 +73,7 @@ public class Cidade extends Hashable<Cidade, String> {
     {
         setId(Integer.parseInt(linha.substring(comecoId, fimId).trim()));
         setNome(linha.substring(comecoNome, fimNome).trim());
-        setX(Float.parseFloat(linha.substring(comecoX, fimX).trim().replace(',', '.')));
+        setX(Float.parseFloat(linha.substring(comecoX, fimX).trim().replace(',', '.'))); //replace feito para padronizar String
         setY(Float.parseFloat(linha.substring(comecoY).trim().replace(',', '.')));
     }
 
@@ -87,6 +95,7 @@ public class Cidade extends Hashable<Cidade, String> {
                 getNome().equals(cidade.getNome());
     }
 
+    //métodos que devem ser implementados por Cidade herdar de Hashable<String>
     public String getKey()
     {
         return getNome();

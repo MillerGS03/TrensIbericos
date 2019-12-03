@@ -1,3 +1,9 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,15 +28,15 @@ import java.io.OutputStreamWriter;
 
 
 public class AdicionarCidadeActivity extends AppCompatActivity {
-    HashTable<Cidade, String> cidades;
-
+    //objetos da GUI
     LinearLayout llConteudo;
     EditText edtNome, edtX, edtY;
     Button btnAdd, btnVoltar;
 
-    String nome;
-    float x, y;
+    //HashTable é passada como parâmetro para a página
+    HashTable<Cidade, String> cidades;
 
+    //faz a página atual ficar em fullscreen
     private void iniciarFullscreen()
     {
         new Handler().postDelayed(new Runnable() {
@@ -46,6 +52,7 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         }, 300);
     }
 
+    //fecha o teclado do celular
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = activity.getCurrentFocus();
@@ -69,6 +76,7 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
 
         iniciarFullscreen();
 
+        //se o usuário clicar em qualquer lugar da tela, o seu teclado fechará
         llConteudo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,14 +94,15 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Cidade cidade = getCidade();
+                Cidade cidade = getCidade(); //getCidade() retornará null caso as informações inseridas estiverem erradas
                 if (cidade != null)
                 {
                     try {
-                        adicionarCidade(cidade);
+                        adicionarCidade(cidade); //adiciona a cidade no arquivo texto
                     } catch (Exception ex) {
                         Toast.makeText(AdicionarCidadeActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
                     } finally {
+                        //volta à tela inicial
                         Intent intent = new Intent(AdicionarCidadeActivity.this, MainActivity.class);
                         startActivity(intent);
                     }
@@ -103,6 +112,7 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
             }
         });
 
+        //volta à tela inicial
         btnVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,10 +122,11 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
         });
     }
 
+    //retorna o id da última cidade inserida
     private int getLastId() throws IOException
     {
         BufferedReader leitor = null;
-        InputStream is = openFileInput("Cidades.txt");
+        InputStream is = openFileInput("Cidades.txt"); //abre o arquivo texto do armazenamento interno
 
         if (is != null) {
             leitor = new BufferedReader(new InputStreamReader(is));
@@ -126,47 +137,49 @@ public class AdicionarCidadeActivity extends AppCompatActivity {
 
             is.close();
 
-            Cidade ultima = new Cidade(ultimaLinha);
+            Cidade ultima = new Cidade(ultimaLinha); //instancia a cidade com a última linha salva (última cidade)
 
-            return ultima.getId();
+            return ultima.getId(); //retorna o seu id
         }
-        return -2;
+        return -2; //retorna -2, porque quando for ser somado para atribuir o id da nova cidade, o novo id será -1 (-2 + 1)
     }
 
+    //retorna a nova cidade e, caso as informações estiverem erradas, null
     private Cidade getCidade()
     {
         try {
-            nome = edtNome.getText().toString();
-            x = Float.parseFloat(edtX.getText().toString());
-            y = Float.parseFloat(edtY.getText().toString());
+            String nome = edtNome.getText().toString();
+            float x = Float.parseFloat(edtX.getText().toString());
+            float y = Float.parseFloat(edtY.getText().toString());
 
             Cidade cidade = new Cidade(-1, nome, x, y);
 
-            if (nome.trim().equals(""))
+            if (nome.trim().equals("") || nome.length() > 15) //se o nome for inválido
                 return null;
 
-            if (x > 1 || x < 0)
+            if (x > 1 || x < 0) //se a cordenada x estiver errada
                 return null;
 
-            if (y > 1 || y < 0)
+            if (y > 1 || y < 0) //se a cordenada y estiver errada
                 return null;
 
             for (ListaHash<Cidade, String> lista : cidades.getVetor()) {
                 for (Cidade c : lista) {
-                    if (c.getNome().equals(nome))
+                    if (c.getNome().equals(nome)) //se já houver uma cidade de mesmo nome, a nova cidade não deverá ser adicionada
                         return null;
                 }
             }
 
-            cidade.setId(getLastId() + 1);
+            cidade.setId(getLastId() + 1); //novo id é o id da última cidade + 1
 
             return cidade;
-        } catch (IOException e) {return null;}
+        } catch (IOException e) {return null;} //qualquer situação de exceção é sinônimo de erro de entrada por parte do usuário
     }
 
     private void adicionarCidade(Cidade cidade)
     {
         try {
+            //abre o arquivo texto e salva lá
             OutputStreamWriter escrevedor = new OutputStreamWriter(openFileOutput("Cidades.txt", Context.MODE_APPEND));
             escrevedor.append(cidade.toString() + "\n");
             escrevedor.flush();

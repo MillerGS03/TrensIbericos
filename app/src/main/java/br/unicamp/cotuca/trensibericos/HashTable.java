@@ -1,10 +1,15 @@
+/**
+ * @author 18178 - Felipe Scherer Vicentin
+ * @author 18179 - Gustavo Miller Santos
+ */
+
+
 package br.unicamp.cotuca.trensibericos;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
-public class HashTable<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
+public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
     protected final int TAMANHO_MAX = 10000;
     protected ListaHash[] vet;
     protected int qtdDados;
