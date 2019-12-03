@@ -247,13 +247,18 @@ public class MainActivity extends AppCompatActivity {
                 String c1 = sDe.getSelectedItem().toString();
                 String c2 = sPara.getSelectedItem().toString();
 
-                //ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
-                ListaSimples<Path<Cidade>> res = grafo.getPaths(29, 47);
+                ListaSimples<Path<Cidade>> res = grafo.getPaths(hashCidades.get(c1).getId(), hashCidades.get(c2).getId());
                 ListaSimples<Caminho> caminhos = new ListaSimples<>();
 
                 for (Path<Cidade> path : res) {
-                    caminhos.add(new Caminho(path.getPath(), (int)path.getParams().get(0), (int)path.getParams().get(1)));
+                    Caminho caminho = new Caminho();
+                    caminho.setCidades(path.getPath());
+                    caminho.setDistancia((double)path.getParams().get(0));
+                    caminho.setTempo((double)path.getParams().get(1));
+                    caminhos.add(caminho);
                 }
+
+                caminhos.get(0).setPrincipal(true);
 
                 mapa.setCaminhos(caminhos);
             }

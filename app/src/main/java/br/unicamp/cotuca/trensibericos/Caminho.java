@@ -5,23 +5,23 @@ import java.util.Objects;
 
 public class Caminho extends Hashable<Caminho, String> {
     private ListaSimples<Cidade> cidades;
-    private int distancia, tempo;
+    private double distancia, tempo;
     private boolean principal;
 
-    public int getDistancia()
+    public double getDistancia()
     {
         return distancia;
     }
-    public void setDistancia(int d)
+    public void setDistancia(double d)
     {
         distancia = d;
     }
 
-    public int getTempo()
+    public double getTempo()
     {
         return tempo;
     }
-    public void setTempo(int t)
+    public void setTempo(double t)
     {
         tempo = t;
     }
@@ -41,7 +41,7 @@ public class Caminho extends Hashable<Caminho, String> {
         tempo = distancia = -1;
     }
 
-    public Caminho(Cidade c1, Cidade c2, int d, int t)
+    public Caminho(Cidade c1, Cidade c2, double d, double t)
     {
         cidades = new ListaSimples<Cidade>();
         cidades.add(c1);
@@ -50,7 +50,7 @@ public class Caminho extends Hashable<Caminho, String> {
         setTempo(t);
     }
 
-    public Caminho(ListaSimples<Cidade> cidades, int d, int t) {
+    public Caminho(ListaSimples<Cidade> cidades, double d, double t) {
         this.cidades = cidades;
         setDistancia(d);
         setTempo(t);

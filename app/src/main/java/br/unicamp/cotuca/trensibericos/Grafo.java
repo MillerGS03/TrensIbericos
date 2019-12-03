@@ -38,36 +38,37 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         nos = new ListaSimples<>();
     }
     protected void resetarNos(int inicio, int ordenacao) {
+        for(NoGrafo<Dado> no : nos) {
+            no.setFoiVisitado(false);
+        }
+        NoGrafo<Dado> comeco = nos.get(inicio);
+        comeco.setFoiVisitado(true);
+
         int ind = 0;
 
         for(NoGrafo<Dado> no : nos) {
-            no.setAnterior(null);
+            no.setAnterior(comeco);
             ListaSimples lista = adj[inicio][ind];
             if (lista != null)
                 no.setDistancia(((Number)lista.get(ordenacao)).doubleValue());
             else
                 no.setDistancia(Double.POSITIVE_INFINITY);
-            no.setFoiVisitado(false);
-
             ind++;
         }
-
+        comeco.setAnterior(null);
     }
 
     protected Path<Dado> getPath(int c1, int c2, int ordenacao) {
         resetarNos(c1, ordenacao);
 
-        nos.get(c1).setFoiVisitado(true);
-        nos.get(c1).setDistancia(0);
-
         Path<Dado> path = new Path<>();
 
         for (int i = 0; i < nos.getSize(); i++)
         {
-            int indiceMenor = findClosest();
-            if (indiceMenor < 0) continue;
-            nos.get(indiceMenor).setFoiVisitado(true);
-            updateNearNodes(indiceMenor, ordenacao);
+            int verticeAtual = findClosest();
+            if (verticeAtual < 0) continue;
+            nos.get(verticeAtual).setFoiVisitado(true);
+            updateNearNodes(verticeAtual, ordenacao);
         }
 
         buildPath(path, c2);
@@ -79,7 +80,7 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
         int indiceAtual = 0, indiceMenor = -1;
         double minDist = Double.POSITIVE_INFINITY;
         for (NoGrafo<Dado> no : nos) {
-            if (!no.foiVisitado() && no.getDistancia() != -1 && no.getDistancia() <= minDist) {
+            if (!no.foiVisitado() && no.getDistancia() < minDist) {
                 indiceMenor = indiceAtual;
                 minDist = no.getDistancia();
             }
@@ -101,21 +102,22 @@ public class Grafo<Dado extends Serializable & Comparable<Dado>> {
     }
     protected void updateNearNodes(int indiceMenor, int ordenacao)
     {
+        NoGrafo<Dado> menor = nos.get(indiceMenor);
         for (int i = 0; i < nos.getSize(); i++)
         {
             NoGrafo<Dado> atual = nos.get(i);
-            if (!atual.foiVisitado())
+                if (!atual.foiVisitado())
             {
                 Object atualAteProximo = adj[indiceMenor][i] != null?adj[indiceMenor][i].get(ordenacao):null;
                 if (atualAteProximo == null) continue;
                 if (!(atualAteProximo instanceof Number))
                     break;
 
-                double distancia = ((Number)atualAteProximo).doubleValue() + nos.get(indiceMenor).getDistancia();
+                double distancia = ((Number)atualAteProximo).doubleValue() + menor.getDistancia();
 
                 if (distancia < atual.getDistancia())
                 {
-                    atual.setAnterior(nos.get(indiceMenor));
+                    atual.setAnterior(menor);
                     atual.setDistancia(distancia);
                 }
             }

@@ -96,6 +96,7 @@ public class CanvasMapa extends View {
                 x1 = cidade.getX() * getWidth();
                 y1 = cidade.getY() * getHeight();
             }
+            x1 = y1 = x2 = y2 = -1;
         }
     }
 

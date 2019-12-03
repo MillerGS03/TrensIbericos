@@ -93,11 +93,29 @@ public class ListaSimples<Dado> implements Serializable, Iterable<Dado> {
             no1 = no1.getProx();
             no2 = no2.getProx();
         }
+        while(no2 != null) {
+            add(no2.getInfo());
+            no2 = no2.getProx();
+        }
     }
 
     public int getSize()
     {
         return qtd;
+    }
+
+    public String toString() {
+        String ret = "";
+        No<Dado> no = comeco;
+
+        while(no != null) {
+            ret += no.getInfo().toString() + ", ";
+            no = no.getProx();
+        }
+
+        if (ret.length() > 2)
+            ret = ret.substring(0, ret.length() - 2);
+        return ret;
     }
 
     public Dado[] toArray(Class<? extends Dado[]> classe)
