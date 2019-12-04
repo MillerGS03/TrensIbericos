@@ -217,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
             for (Caminho caminho : caminhos) { //para cada caminho, criar uma ligação no grafo entre as respectivas cidades e passamos as variáveis de ordenação (distancia e tempo)
                 grafo.setLigacao(caminho.getCidades().get(0).getId(), caminho.getCidades().get(1).getId(),
                         caminho.getDistancia(), caminho.getTempo());
+
+                grafo.setLigacao(caminho.getCidades().get(1).getId(), caminho.getCidades().get(0).getId(),
+                        caminho.getDistancia(), caminho.getTempo());
             }
         } catch (Exception ex) {
             try {
