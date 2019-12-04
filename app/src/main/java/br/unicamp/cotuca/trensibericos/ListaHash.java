@@ -9,7 +9,7 @@ package br.unicamp.cotuca.trensibericos;
 import java.io.Serializable;
 
 // Lista necessária para o BucketHash. Ela herda de ListaSimples, e portanto tem todos os seus métodos
-public class ListaHash<Dado extends Hashable<Key>, Key extends Comparable<Key> & Serializable> extends ListaSimples<Dado> implements Serializable {
+public class ListaHash<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> extends ListaSimples<Dado> implements Serializable {
     
     // Remove o dado correspondente àquela chave
     public void remove(Key key)

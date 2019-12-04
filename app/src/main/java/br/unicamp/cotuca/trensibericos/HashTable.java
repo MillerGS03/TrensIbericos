@@ -9,7 +9,7 @@ package br.unicamp.cotuca.trensibericos;
 import java.io.Serializable;
 import java.util.function.Predicate;
 
-public class HashTable<Dado extends Hashable<Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
+public class HashTable<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key> & Serializable> implements Serializable {
     protected final int TAMANHO_MAX = 10000;
     protected ListaHash[] vet;
     protected int qtdDados;

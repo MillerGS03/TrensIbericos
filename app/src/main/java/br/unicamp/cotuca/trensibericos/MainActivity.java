@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     //objetos da GUI
@@ -231,8 +232,11 @@ public class MainActivity extends AppCompatActivity {
 
         ListaSimples<String> nomes = cidades.getKeys(); //retorna os nomes de todas as cidades para serem adicionadas às listas da GUI (Spinners)
 
-        sDe.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
-        sPara.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomes.toArray(String[].class)));
+        String[] nomesArr = nomes.toArray(String[].class);
+        Arrays.sort(nomesArr);
+
+        sDe.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomesArr));
+        sPara.setAdapter(new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, nomesArr));
 
         //abre a página de adição de cidade
         btnAddCidade.setOnClickListener(new View.OnClickListener() {

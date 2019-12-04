@@ -10,14 +10,14 @@ import java.io.Serializable;
 
 //classe abstrata que representa o Dado da HashTable que implementa compareTo e é serializável
 //o Dado pode ter uma chave de um tipo genérico, não apenas String
-public abstract class Hashable<Key extends Comparable<Key>> implements Comparable<Hashable<Key>>, Serializable {
+public abstract class Hashable<Dado extends Hashable<Dado, Key>, Key extends Comparable<Key>> implements Comparable<Dado>, Serializable {
 
     public abstract Key getKey();
 
     public abstract long getKeyHashcode(Key key);
 
     //o compareTo já é implementado. Assim, a classe que herdar Hashable não precisará implementá-lo
-    public int compareTo(Hashable<Key> dado)
+    public int compareTo(Dado dado)
     {
         return getKey().compareTo(dado.getKey());
     }

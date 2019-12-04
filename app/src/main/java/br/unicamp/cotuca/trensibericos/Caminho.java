@@ -7,7 +7,6 @@
 package br.unicamp.cotuca.trensibericos;
 
 import java.util.Locale;
-import java.util.Objects;
 
 //classe do Caminho
 public class Caminho{

@@ -9,7 +9,7 @@ package br.unicamp.cotuca.trensibericos;
 import java.util.Locale;
 
 //classe Cidade que herda de Hashable<String> para poder ser tipo válido da HashTable
-public class Cidade extends Hashable<String> {
+public class Cidade extends Hashable<Cidade, String> {
     public final int comecoId = 0;
     public final int fimId = 2;
     public final int comecoNome = fimId;
@@ -103,9 +103,8 @@ public class Cidade extends Hashable<String> {
 
     public long getKeyHashcode(String hash) {
         long ret = 88;
-        for(byte b : hash.getBytes()) {
-            ret = 7 * ret + b;
-        }
+        for (int i = 0; i < hash.length(); i++)
+            ret = 7 * ret + hash.charAt(i);
         return ret;
     }
 }
